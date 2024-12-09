@@ -20,9 +20,9 @@ if (isset($_POST["submit"])) {
         $_SESSION["role"] = $row["role"];
 
         if ($row["role"] == 'pegawai') {
-            header("Location: admin/index.php"); // Ubah ke direktori pegawai
+            header("Location: admin/index.php"); // Masuk ke direktori pegawai
         } else if ($row["role"] == 'admin') {
-            header("Location: admin/index.php"); // Ubah ke direktori admin
+            header("Location: admin/index.php"); // Masuk ke direktori admin
         }
         exit;
     } else {

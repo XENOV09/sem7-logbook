@@ -3,7 +3,7 @@ session_start();
 include "../koneksi.php";
 
 if (!isset($_SESSION['id_user'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -77,22 +77,7 @@ $tanggal_count = mysqli_fetch_assoc($tanggal_result)['count'];
 <body class="page-top">
     <div class="page-wrapper">
         <!-- HEADER MOBILE-->
-        <header class="header-mobile d-block d-lg-none">
-            <div class="header-mobile__bar">
-                <div class="container-fluid">
-                    <div class="header-mobile-inner">
-                        <a class="logo" href="index.html">
-                            <img src="images/icon/logo.png" alt="CoolAdmin" />
-                        </a>
-                        <button class="hamburger hamburger--slider" type="button">
-                            <span class="hamburger-box">
-                                <span class="hamburger-inner"></span>
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
+
         <!-- END HEADER MOBILE-->
 
         <!-- MENU SIDEBAR-->
@@ -128,7 +113,7 @@ $tanggal_count = mysqli_fetch_assoc($tanggal_result)['count'];
                     <div class="row">
                         <div class="col-md-12">
                             <div class="overview-wrap">
-                                <h2 class="title-1">Overview</h2>
+                                <h2 class="title-1">Dashboard</h2>
                             </div>
                         </div>
                     </div>
