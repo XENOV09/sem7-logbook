@@ -65,13 +65,14 @@ if (!isset($_SESSION['id_user'])) {
                     <div class="row">
                         <div class="col-md-12">
                             <div class="overview-wrap">
-                                <h2 class="title-1">Dashboard</h2>
+                                <h2 class="title-1">Logbook</h2>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
             <!-- END MAIN CONTENT-->
             <!-- END PAGE CONTAINER-->
         </div>

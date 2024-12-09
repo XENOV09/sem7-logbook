@@ -175,7 +175,7 @@
 
             <!-- Menu Utama -->
             <li class="has-sub">
-                <a class="js-arrow" href="#">
+                <a class="js-arrow">
                     <i class="fas fa-book"></i>Menu Utama
                 </a>
                 <ul class="list-unstyled navbar__sub-list">
@@ -185,7 +185,7 @@
 
             <!-- Kelola Data -->
             <li class="has-sub">
-                <a class="js-arrow" href="#">
+                <a class="js-arrow">
                     <i class="fas fa-gear"></i>Kelola Data
                 </a>
                 <ul class="list-unstyled navbar__sub-list">
@@ -222,21 +222,6 @@
                     <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (basename($_SERVER['PHP_SELF']) == 'kegiatan.php') ? 'style="display:block;"' : '' ?>>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'kegiatan.php') ? 'active' : '' ?>">
                             <a href="kegiatan.php">Kegiatan</a>
-                        </li>
-                    </ul>
-                </li>
-
-                <!-- Kelola Data -->
-                <li class="has-sub <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php'])) ? 'active show' : '' ?>">
-                    <a class="js-arrow" href="#">
-                        <i class="fas fa-gear"></i>Kelola Data
-                    </a>
-                    <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php'])) ? 'style="display:block;"' : '' ?>>
-                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'user.php') ? 'active' : '' ?>">
-                            <a href="user.php">Pengguna Terdaftar</a>
-                        </li>
-                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'divisi.php') ? 'active' : '' ?>">
-                            <a href="divisi.php">Manajemen Divisi</a>
                         </li>
                     </ul>
                 </li>
