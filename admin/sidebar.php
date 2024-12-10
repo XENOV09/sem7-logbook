@@ -238,6 +238,9 @@
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'divisi.php') ? 'active' : '' ?>">
                             <a href="divisi.php">Manajemen Divisi</a>
                         </li>
+                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'jenis_kegiatan.php') ? 'active' : '' ?>">
+                            <a href="divisi.php">Manajemen Jenis Kegiatan</a>
+                        </li>
                     </ul>
                 </li>
             </ul>

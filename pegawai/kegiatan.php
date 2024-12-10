@@ -93,6 +93,12 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
     <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet">
     <!-- Link ke CSS Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tambahkan DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- Untuk fixed header -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css">
+
+
 
 </head>
 <body class="page-top">
@@ -159,90 +165,92 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                         <!-- Tabel untuk menampilkan data kegiatan -->
                         <div class="card">
                             <div class="card-body">
-                            <!-- Menambahkan tombol "Tambah Kegiatan" di atas kanan tabel -->
-                            <div class="row mb-3">
-                                <div class="col-lg-12 text-end">
-                                    <a href="tambah_kegiatan.php" class="btn btn-primary"><i class="bx bx-plus"></i> Tambah Kegiatan</a>
+                                <!-- Menambahkan tombol "Tambah Kegiatan" di atas kanan tabel -->
+                                <div class="row mb-3">
+                                    <div class="col-lg-12 text-end">
+                                        <a href="tambah_kegiatan.php" class="btn btn-primary"><i class="bx bx-plus"></i> Tambah Kegiatan</a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                            <div class="col-lg-12">
-                                <div class="table-responsive table--no-card m-b-30">
-                                    <table class="table table-borderless table-striped table-earning">
-                                    <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Tanggal Kegiatan</th> <!-- Kolom Tanggal Kegiatan -->
-                                                <th>Oleh</th>
-                                                <th>Jenis Kegiatan</th> <!-- Kolom Jenis Kegiatan -->
-                                                <th>Kegiatan</th>
-                                                <th>Lokasi</th>
-                                                <th>Waktu Mulai</th>
-                                                <th>Waktu Selesai</th>
-                                                <th>Budget</th>
-                                                <th>Pengeluaran</th>
-                                                <th>Sisa</th>
-                                                <th>Catatan</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                                $search = isset($_POST['search']) ? $_POST['search'] : '';
-                                                $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
-                                                $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
-                                                $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive table--no-card m-b-30">
+                                            <!-- Ganti ID tabel agar sesuai dengan DataTables -->
+                                            <table id="kegiatanTable" class="table table-borderless table-striped table-earning">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Tanggal Kegiatan</th>
+                                                        <th>Oleh</th>
+                                                        <th>Jenis Kegiatan</th>
+                                                        <th>Kegiatan</th>
+                                                        <th>Lokasi</th>
+                                                        <th>Waktu Mulai</th>
+                                                        <th>Waktu Selesai</th>
+                                                        <th>Budget</th>
+                                                        <th>Pengeluaran</th>
+                                                        <th>Sisa</th>
+                                                        <th>Catatan</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    // Filter dan parameter dari POST
+                                                    $search = isset($_POST['search']) ? $_POST['search'] : '';
+                                                    $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
+                                                    $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
+                                                    $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
 
-                                                // Query dasar untuk mengambil kegiatan
-                                                $sql_kegiatan = "
-                                                    SELECT k.*, j.jenis, u.nm_user
-                                                    FROM kegiatan k
-                                                    JOIN jenis j ON j.id_jenis = k.id_jenis
-                                                    JOIN user u ON u.id_user = k.id_user
-                                                    WHERE k.id_divisi = '$id_divisi_user'";
+                                                    // Query dasar
+                                                    $sql_kegiatan = "
+                                                        SELECT k.*, j.jenis, u.nm_user 
+                                                        FROM kegiatan k
+                                                        JOIN jenis j ON j.id_jenis = k.id_jenis
+                                                        JOIN user u ON u.id_user = k.id_user
+                                                        WHERE k.id_divisi = '$id_divisi_user'";
 
-                                                // Jika ada keyword pencarian
-                                                if ($search) {
-                                                    $sql_kegiatan .= " AND (k.kegiatan LIKE '%$search%' OR u.nm_user LIKE '%$search%' OR j.jenis LIKE '%$search%' OR k.lokasi LIKE '%$search%')";
-                                                }
+                                                    // Pencarian
+                                                    if ($search) {
+                                                        $sql_kegiatan .= " AND (k.kegiatan LIKE '%$search%' OR u.nm_user LIKE '%$search%' OR j.jenis LIKE '%$search%' OR k.lokasi LIKE '%$search%')";
+                                                    }
 
-                                                // Filter berdasarkan tanggal dan user
-                                                if ($tanggal_awal && $tanggal_akhir) {
-                                                    $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
-                                                }
+                                                    // Filter berdasarkan tanggal dan user
+                                                    if ($tanggal_awal && $tanggal_akhir) {
+                                                        $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+                                                    }
 
-                                                if ($id_user_filter) {
-                                                    $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
-                                                }
+                                                    if ($id_user_filter) {
+                                                        $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
+                                                    }
 
-                                                // Eksekusi query
-                                                $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
-                                                $no = 1;
-                                                while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
-                                            ?>
-                                            <tr>
-                                                <td><?php echo $no++; ?></td> <!-- Menampilkan nomor urut otomatis -->
-                                                <td style="white-space: nowrap;"><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td> <!-- Menampilkan tanggal kegiatan -->
-                                                <td><?php echo $row_kegiatan['nm_user']; ?></td> <!-- Menampilkan nama penginput otomatis -->
-                                                <td><?php echo $row_kegiatan['jenis']; ?></td> <!-- Menampilkan jenis kegiatan -->
-                                                <td><?php echo $row_kegiatan["kegiatan"]; ?></td>
-                                                <td><?php echo $row_kegiatan["lokasi"]; ?></td>
-                                                <td><?php echo $row_kegiatan["waktu_mulai"]; ?></td>
-                                                <td><?php echo $row_kegiatan["waktu_selesai"]; ?></td>
-                                                <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["budget"], 0, ',', '.'); ?></td>
-                                                <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["pengeluaran"], 0, ',', '.'); ?></td>
-                                                <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["sisa"], 0, ',', '.'); ?></td>
-                                                <td><?php echo $row_kegiatan["catatan"]; ?></td>
-                                                <td>
-                                                    <div class="btn-group" role="group" aria-label="Basic example">
-                                                    <a href="surat_masuk_edit.php?id=<?php echo $row_kegiatan["id_kegiatan"]?>" class="btn btn-sm btn-success"><i class="bx bx-pencil"></i> Edit</a>
-                                                    <a href="surat_masuk_hapus.php?id=<?php echo $row_kegiatan["id_kegiatan"]?>" class="btn btn-sm btn-danger" onClick="return confirm('Apakah anda yakin ingin menghapus data ini...?')"><i class="bx bx-trash"></i> Hapus</a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <?php } ?>
-                                        </tbody>
-                                    </table>
+                                                    // Eksekusi query
+                                                    $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
+                                                    $no = 1;
+                                                    while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
+                                                    ?>
+                                                    <tr>
+                                                        <td><?php echo $no++; ?></td>
+                                                        <td><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td>
+                                                        <td><?php echo $row_kegiatan['nm_user']; ?></td>
+                                                        <td><?php echo $row_kegiatan['jenis']; ?></td>
+                                                        <td><?php echo $row_kegiatan['kegiatan']; ?></td>
+                                                        <td><?php echo $row_kegiatan['lokasi']; ?></td>
+                                                        <td><?php echo $row_kegiatan['waktu_mulai']; ?></td>
+                                                        <td><?php echo $row_kegiatan['waktu_selesai']; ?></td>
+                                                        <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
+                                                        <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
+                                                        <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
+                                                        <td><?php echo $row_kegiatan['catatan']; ?></td>
+                                                        <td>
+                                                            <a href="surat_masuk_edit.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
+                                                            <a href="surat_masuk_hapus.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                                                        </td>
+                                                    </tr>
+                                                    <?php } ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -259,7 +267,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
     <!-- Bootstrap JS-->
     <script src="../vendor/bootstrap-4.1/popper.min.js"></script>
     <script src="../vendor/bootstrap-4.1/bootstrap.min.js"></script>
-    <!-- Vendor JS-->
+    <!-- Vendor JS -->
     <script src="../vendor/slick/slick.min.js"></script>
     <script src="../vendor/wow/wow.min.js"></script>
     <script src="../vendor/animsition/animsition.min.js"></script>
@@ -273,11 +281,37 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
 
     <!-- Main JS-->
     <script src="../js/main.js"></script>
+
+    <!-- Script untuk fixed header -->
+    <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+    <!-- Tambahkan jQuery (wajib) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Tambahkan DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- Main JS-->
+    <script src="../js/main.js"></script>
     <!-- Agar Teks tidak berubah jadi link -->
     <style>
         a {
             text-decoration: none;
         }
     </style>
+    <script>
+        $(document).ready(function() {
+            $('#kegiatanTable').DataTable({
+                "scrollX": true,          // Aktifkan pengguliran horizontal
+                "paging": true,           // Aktifkan pagination
+                "searching": false,       // Aktifkan pencarian
+                "ordering": true,         // Aktifkan pengurutan
+                "info": true,             // Tampilkan info jumlah data
+                "lengthChange": true,     // Pilihan jumlah data per halaman
+                "pageLength": 10,         // Banyaknya data per halaman
+                "fixedColumns": {
+                    leftColumns: 1,       // Buat kolom pertama tetap statis
+                    rightColumns: 1       // Buat kolom terakhir tetap statis
+                }
+            });
+        });
+    </script>
 </body>
 </html>

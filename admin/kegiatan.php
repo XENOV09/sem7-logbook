@@ -2,11 +2,56 @@
 session_start();
 include "../koneksi.php";
 
+// Cek apakah user sudah login
 if (!isset($_SESSION['id_user'])) {
     header("Location: ../login.php");
     exit();
 }
 
+// Ambil id_user dari session
+$id_user = $_SESSION['id_user'];
+
+// Ambil id_divisi dari tabel user berdasarkan id_user
+$result_user = mysqli_query($conn, "SELECT id_divisi FROM user WHERE id_user = '$id_user'");
+$user_data = mysqli_fetch_assoc($result_user);
+$id_divisi_user = $user_data['id_divisi'];
+
+// Ambil nama divisi berdasarkan id_divisi
+$result_divisi = mysqli_query($conn, "SELECT nm_divisi FROM divisi WHERE id_divisi = '$id_divisi_user'");
+$divisi_data = mysqli_fetch_assoc($result_divisi);
+$nm_divisi = $divisi_data ? $divisi_data['nm_divisi'] : 'Divisi Tidak Ditemukan';
+
+// Filter tanggal dan user
+$tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
+$tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
+$id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
+
+// Query untuk mendapatkan kegiatan yang sesuai dengan id_divisi user dan tanggal filter
+$sql_kegiatan = "
+    SELECT k.*, j.jenis, u.nm_user
+    FROM kegiatan k
+    JOIN jenis j ON j.id_jenis = k.id_jenis
+    JOIN user u ON u.id_user = k.id_user
+    WHERE k.id_divisi = '$id_divisi_user'";
+
+if ($tanggal_awal && $tanggal_akhir) {
+    $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+} elseif ($tanggal_awal) {
+    $sql_kegiatan .= " AND k.tanggal >= '$tanggal_awal'";
+} elseif ($tanggal_akhir) {
+    $sql_kegiatan .= " AND k.tanggal <= '$tanggal_akhir'";
+}
+
+if ($id_user_filter) {
+    $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
+}
+
+
+$result_kegiatan = mysqli_query($conn, $sql_kegiatan);
+$jml_logbook = mysqli_num_rows($result_kegiatan);
+
+// Ambil daftar user untuk dropdown (dengan filter id_divisi)
+$result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHERE id_divisi = '$id_divisi_user'");
 ?>
 
 <!DOCTYPE html>
@@ -21,7 +66,7 @@ if (!isset($_SESSION['id_user'])) {
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Dashboard</title>
+    <title>Logbook</title>
 
     <!-- Fontfaces CSS-->
     <link href="../css/font-face.css" rel="stylesheet" media="all">
@@ -44,6 +89,17 @@ if (!isset($_SESSION['id_user'])) {
     <!-- Main CSS-->
     <link href="../css/theme.css" rel="stylesheet" media="all">
 
+    <!-- Link Pack Icon-->
+    <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <!-- Link ke CSS Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tambahkan DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- Untuk fixed header -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css">
+
+
+
 </head>
 <body class="page-top">
     <div class="page-wrapper">
@@ -53,30 +109,157 @@ if (!isset($_SESSION['id_user'])) {
         <!-- END MENU SIDEBAR-->
 
         <!-- PAGE CONTAINER-->
-
-            <!-- HEADER DESKTOP-->
-            <?php include 'header.php'; ?>
+        <?php include 'header.php'; ?>
 
             <!-- MAIN CONTENT-->
-        </head>
-        <div class="main-content">
-            <div class="section__content section__content--p30">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="overview-wrap">
-                                <h2 class="title-1">Logbook</h2>
+            <div class="main-content">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="overview-wrap">
+                                <h2 class="title-1">Logbook - <?php echo $nm_divisi; ?></h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter User dan Tanggal -->
+                        <form method="POST" class="mb-3">
+                            <div class="row">
+                                <!-- Tombol Search -->
+                                <div class="col-md-4 mb-2">
+                                    <label for="search">Cari Kegiatan</label>
+                                    <input type="text" name="search" class="form-control" placeholder="Cari Kegiatan" value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>">
+                                </div>
+
+                                <!-- Filter User -->
+                                <div class="col-md-2 mb-2">
+                                    <label for="id_user">Pilih User</label>
+                                    <select name="id_user" class="form-control" id="id_user">
+                                        <option value="">Semua</option>
+                                        <?php while ($user = mysqli_fetch_assoc($result_user_filter)) { ?>
+                                            <option value="<?php echo $user['id_user']; ?>" <?php echo ($id_user_filter == $user['id_user']) ? 'selected' : ''; ?>><?php echo $user['nm_user']; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+
+                                <!-- Filter Tanggal Awal -->
+                                <div class="col-md-2 mb-2">
+                                    <label for="tanggal_awal">Tanggal Awal</label>
+                                    <input type="date" name="tanggal_awal" class="form-control" value="<?php echo $tanggal_awal; ?>" placeholder="Tanggal Awal" id="tanggal_awal">
+                                </div>
+
+                                <!-- Filter Tanggal Akhir -->
+                                <div class="col-md-2 mb-2">
+                                    <label for="tanggal_akhir">Tanggal Akhir</label>
+                                    <input type="date" name="tanggal_akhir" class="form-control" value="<?php echo $tanggal_akhir; ?>" placeholder="Tanggal Akhir" id="tanggal_akhir">
+                                </div>
+
+                                <!-- Tombol Filter -->
+                                <div class="col-md-2 mb-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-success w-100">Filter</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Tabel untuk menampilkan data kegiatan -->
+                        <div class="card">
+                            <div class="card-body">
+                                <!-- Menambahkan tombol "Tambah Kegiatan" di atas kanan tabel -->
+                                <div class="row mb-3">
+                                    <div class="col-lg-12 text-end">
+                                        <a href="tambah_kegiatan.php" class="btn btn-primary"><i class="bx bx-plus"></i> Tambah Kegiatan</a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive table--no-card m-b-30">
+                                            <!-- Ganti ID tabel agar sesuai dengan DataTables -->
+                                            <table id="kegiatanTable" class="table table-borderless table-striped table-earning">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Tanggal Kegiatan</th>
+                                                        <th>Oleh</th>
+                                                        <th>Jenis Kegiatan</th>
+                                                        <th>Kegiatan</th>
+                                                        <th>Lokasi</th>
+                                                        <th>Waktu Mulai</th>
+                                                        <th>Waktu Selesai</th>
+                                                        <th>Budget</th>
+                                                        <th>Pengeluaran</th>
+                                                        <th>Sisa</th>
+                                                        <th>Catatan</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    // Filter dan parameter dari POST
+                                                    $search = isset($_POST['search']) ? $_POST['search'] : '';
+                                                    $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
+                                                    $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
+                                                    $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
+
+                                                    // Query dasar
+                                                    $sql_kegiatan = "
+                                                        SELECT k.*, j.jenis, u.nm_user 
+                                                        FROM kegiatan k
+                                                        JOIN jenis j ON j.id_jenis = k.id_jenis
+                                                        JOIN user u ON u.id_user = k.id_user
+                                                        WHERE k.id_divisi = '$id_divisi_user'";
+
+                                                    // Pencarian
+                                                    if ($search) {
+                                                        $sql_kegiatan .= " AND (k.kegiatan LIKE '%$search%' OR u.nm_user LIKE '%$search%' OR j.jenis LIKE '%$search%' OR k.lokasi LIKE '%$search%')";
+                                                    }
+
+                                                    // Filter berdasarkan tanggal dan user
+                                                    if ($tanggal_awal && $tanggal_akhir) {
+                                                        $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+                                                    }
+
+                                                    if ($id_user_filter) {
+                                                        $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
+                                                    }
+
+                                                    // Eksekusi query
+                                                    $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
+                                                    $no = 1;
+                                                    while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
+                                                    ?>
+                                                    <tr>
+                                                        <td><?php echo $no++; ?></td>
+                                                        <td><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td>
+                                                        <td><?php echo $row_kegiatan['nm_user']; ?></td>
+                                                        <td><?php echo $row_kegiatan['jenis']; ?></td>
+                                                        <td><?php echo $row_kegiatan['kegiatan']; ?></td>
+                                                        <td><?php echo $row_kegiatan['lokasi']; ?></td>
+                                                        <td><?php echo $row_kegiatan['waktu_mulai']; ?></td>
+                                                        <td><?php echo $row_kegiatan['waktu_selesai']; ?></td>
+                                                        <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
+                                                        <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
+                                                        <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
+                                                        <td><?php echo $row_kegiatan['catatan']; ?></td>
+                                                        <td>
+                                                            <a href="surat_masuk_edit.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
+                                                            <a href="surat_masuk_hapus.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                                                        </td>
+                                                    </tr>
+                                                    <?php } ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-            <!-- END MAIN CONTENT-->
-            <!-- END PAGE CONTAINER-->
-        </div>
-
+        <!-- END MAIN CONTENT-->
+        <!-- END PAGE CONTAINER-->
     </div>
 
     <!-- Jquery JS-->
@@ -84,27 +267,48 @@ if (!isset($_SESSION['id_user'])) {
     <!-- Bootstrap JS-->
     <script src="../vendor/bootstrap-4.1/popper.min.js"></script>
     <script src="../vendor/bootstrap-4.1/bootstrap.min.js"></script>
-    <!-- Vendor JS       -->
-    <script src="../vendor/slick/slick.min.js">
-    </script>
+    <!-- Vendor JS -->
+    <script src="../vendor/slick/slick.min.js"></script>
     <script src="../vendor/wow/wow.min.js"></script>
     <script src="../vendor/animsition/animsition.min.js"></script>
-    <script src="../vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">
-    </script>
+    <script src="../vendor/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <script src="../vendor/counter-up/jquery.waypoints.min.js"></script>
-    <script src="../vendor/counter-up/jquery.counterup.min.js">
-    </script>
+    <script src="../vendor/counter-up/jquery.counterup.min.js"></script>
     <script src="../vendor/circle-progress/circle-progress.min.js"></script>
     <script src="../vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
     <script src="../vendor/chartjs/Chart.bundle.min.js"></script>
-    <script src="../vendor/select2/select2.min.js">
-    </script>
+    <script src="../vendor/select2/select2.min.js"></script>
 
+    <!-- Script untuk fixed header -->
+    <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+    <!-- Tambahkan jQuery (wajib) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Tambahkan DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <!-- Main JS-->
     <script src="../js/main.js"></script>
-
-
+    <!-- Agar Teks tidak berubah jadi link -->
+    <style>
+        a {
+            text-decoration: none;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('#kegiatanTable').DataTable({
+                "scrollX": true,          // Aktifkan pengguliran horizontal
+                "paging": true,           // Aktifkan pagination
+                "searching": false,       // Aktifkan pencarian
+                "ordering": true,         // Aktifkan pengurutan
+                "info": true,             // Tampilkan info jumlah data
+                "lengthChange": true,     // Pilihan jumlah data per halaman
+                "pageLength": 10,         // Banyaknya data per halaman
+                "fixedColumns": {
+                    leftColumns: 1,       // Buat kolom pertama tetap statis
+                    rightColumns: 1       // Buat kolom terakhir tetap statis
+                }
+            });
+        });
+    </script>
 </body>
-
 </html>
-<!-- end document-->
