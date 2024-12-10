@@ -11,19 +11,19 @@ if (!isset($_SESSION['id_user'])) {
 $user_query = "SELECT COUNT(*) AS count FROM user";
 $divisi_query = "SELECT COUNT(*) AS count FROM divisi";
 $kegiatan_query = "SELECT COUNT(*) AS count FROM kegiatan";
-$tanggal_query = "SELECT COUNT(*) AS count FROM tanggal";
+$jenis_query = "SELECT COUNT(*) AS count FROM jenis";
 
 // Eksekusi query
 $user_result = mysqli_query($conn, $user_query);
 $divisi_result = mysqli_query($conn, $divisi_query);
 $kegiatan_result = mysqli_query($conn, $kegiatan_query);
-$tanggal_result = mysqli_query($conn, $tanggal_query);
+$jenis_result = mysqli_query($conn, $jenis_query);
 
 // Ambil hasil hitungan
 $user_count = mysqli_fetch_assoc($user_result)['count'];
 $divisi_count = mysqli_fetch_assoc($divisi_result)['count'];
 $kegiatan_count = mysqli_fetch_assoc($kegiatan_result)['count'];
-$tanggal_count = mysqli_fetch_assoc($tanggal_result)['count'];
+$jenis_count = mysqli_fetch_assoc($jenis_result)['count'];
 ?>
 
 <!DOCTYPE html>
@@ -160,7 +160,7 @@ $tanggal_count = mysqli_fetch_assoc($tanggal_result)['count'];
                                         </div>
                                         <div class="text">
                                             <h2><?= $kegiatan_count ?></h2> <!-- Insert the kegiatan count here -->
-                                            <span>Aktifitas</span> <!-- You can customize this label -->
+                                            <span>Kegiatan</span> <!-- You can customize this label -->
                                         </div>
                                     </div>
                                 </div>
@@ -173,11 +173,11 @@ $tanggal_count = mysqli_fetch_assoc($tanggal_result)['count'];
                                 <div class="overview__inner">
                                     <div class="overview-box clearfix">
                                         <div class="icon">
-                                            <i class="zmdi zmdi-calendar"></i>
+                                            <i class="zmdi zmdi-check-square"></i>
                                         </div>
                                         <div class="text">
-                                            <h2><?= $tanggal_count ?></h2> <!-- Insert the tanggal count here -->
-                                            <span>Tanggal</span> <!-- You can customize this label -->
+                                            <h2><?= $jenis_count ?></h2> <!-- Insert the tanggal count here -->
+                                            <span>Jenis Kegiatan</span> <!-- You can customize this label -->
                                         </div>
                                     </div>
                                 </div>

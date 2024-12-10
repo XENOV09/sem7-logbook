@@ -28,18 +28,24 @@ $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
 
 // Query untuk mendapatkan kegiatan yang sesuai dengan id_divisi user dan tanggal filter
 $sql_kegiatan = "
-    SELECT k.*, t.id_divisi AS id_divisi_tanggal 
+    SELECT k.*, j.jenis, u.nm_user
     FROM kegiatan k
-    JOIN tanggal t ON t.id_tanggal = k.id_tanggal 
-    WHERE k.id_divisi = '$id_divisi_user' AND t.id_divisi = '$id_divisi_user'";
+    JOIN jenis j ON j.id_jenis = k.id_jenis
+    JOIN user u ON u.id_user = k.id_user
+    WHERE k.id_divisi = '$id_divisi_user'";
 
 if ($tanggal_awal && $tanggal_akhir) {
-    $sql_kegiatan .= " AND t.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+    $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+} elseif ($tanggal_awal) {
+    $sql_kegiatan .= " AND k.tanggal >= '$tanggal_awal'";
+} elseif ($tanggal_akhir) {
+    $sql_kegiatan .= " AND k.tanggal <= '$tanggal_akhir'";
 }
 
 if ($id_user_filter) {
     $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
 }
+
 
 $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
 $jml_logbook = mysqli_num_rows($result_kegiatan);
@@ -134,6 +140,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                             </div>
                         </form>
 
+
                         <!-- Tabel untuk menampilkan data kegiatan -->
                         <div class="card">
                             <div class="card-body">
@@ -152,6 +159,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                 <th>No</th>
                                                 <th>Tanggal Kegiatan</th> <!-- Kolom Tanggal Kegiatan -->
                                                 <th>Oleh</th>
+                                                <th>Jenis Kegiatan</th> <!-- Kolom Jenis Kegiatan -->
                                                 <th>Kegiatan</th>
                                                 <th>Lokasi</th>
                                                 <th>Waktu Mulai</th>
@@ -166,24 +174,16 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                             <?php
                                                 $no = 1; // Mulai nomor urut dari 1
                                                 while($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
-                                                    // Ambil nama user dari tabel user
-                                                    $nm_user_query = mysqli_query($conn, "SELECT nm_user FROM user WHERE id_user = '".$row_kegiatan['id_user']."'"); 
-                                                    $id_user_row = mysqli_fetch_assoc($nm_user_query);
-                                                    $nm_user = $id_user_row ? $id_user_row['nm_user'] : 'Tidak Ditemukan';  
-
-                                                    // Ambil tanggal kegiatan dari tabel tanggal
-                                                    $tanggal_query = mysqli_query($conn, "SELECT tanggal FROM tanggal WHERE id_tanggal = '".$row_kegiatan['id_tanggal']."'"); 
-                                                    $tanggal_row = mysqli_fetch_assoc($tanggal_query);
-                                                    $tanggal_kegiatan = $tanggal_row ? date('d-m-Y', strtotime($tanggal_row['tanggal'])) : 'Tanggal Tidak Ditemukan';
                                             ?>
                                             <tr>
                                                 <td><?php echo $no++; ?></td> <!-- Menampilkan nomor urut otomatis -->
-                                                <td style="white-space: nowrap;"><?php echo $tanggal_kegiatan; ?></td> <!-- Menampilkan tanggal kegiatan -->
-                                                <td><?php echo $nm_user ?></td> <!-- Menampilkan nama penginput otomatis -->
-                                                <td><?php echo $row_kegiatan["kegiatan"] ?></td>
-                                                <td><?php echo $row_kegiatan["lokasi"] ?></td>
-                                                <td><?php echo $row_kegiatan["waktu_mulai"] ?></td>
-                                                <td><?php echo $row_kegiatan["waktu_selesai"] ?></td>
+                                                <td style="white-space: nowrap;"><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td> <!-- Menampilkan tanggal kegiatan -->
+                                                <td><?php echo $row_kegiatan['nm_user']; ?></td> <!-- Menampilkan nama penginput otomatis -->
+                                                <td><?php echo $row_kegiatan['jenis']; ?></td> <!-- Menampilkan jenis kegiatan -->
+                                                <td><?php echo $row_kegiatan["kegiatan"]; ?></td>
+                                                <td><?php echo $row_kegiatan["lokasi"]; ?></td>
+                                                <td><?php echo $row_kegiatan["waktu_mulai"]; ?></td>
+                                                <td><?php echo $row_kegiatan["waktu_selesai"]; ?></td>
                                                 <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["budget"], 0, ',', '.'); ?></td>
                                                 <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["pengeluaran"], 0, ',', '.'); ?></td>
                                                 <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["sisa"], 0, ',', '.'); ?></td>
@@ -227,11 +227,11 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
 
     <!-- Main JS-->
     <script src="../js/main.js"></script>
+    <!-- Agar Teks tidak berubah jadi link -->
     <style>
         a {
             text-decoration: none;
         }
     </style>
 </body>
-
 </html>

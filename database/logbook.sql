@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 07, 2024 at 07:35 PM
+-- Generation Time: Dec 10, 2024 at 08:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `divisi` (
   `id_divisi` int(8) NOT NULL,
-  `nm_divisi` varchar(30) DEFAULT NULL
+  `nm_divisi` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -46,33 +46,52 @@ INSERT INTO `divisi` (`id_divisi`, `nm_divisi`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `jenis`
+--
+
+CREATE TABLE `jenis` (
+  `id_jenis` int(8) NOT NULL,
+  `jenis` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `jenis`
+--
+
+INSERT INTO `jenis` (`id_jenis`, `jenis`) VALUES
+(1, 'Monitoring dan Evaluasi'),
+(2, 'Survey'),
+(3, 'Layanan Masyarakat'),
+(4, 'Non-Formal');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `kegiatan`
 --
 
 CREATE TABLE `kegiatan` (
   `id_kegiatan` int(8) NOT NULL,
-  `id_tanggal` int(8) NOT NULL,
+  `tanggal` date NOT NULL,
+  `id_jenis` int(8) NOT NULL,
   `id_user` int(8) NOT NULL,
   `id_divisi` int(8) NOT NULL,
   `kegiatan` varchar(500) NOT NULL,
   `lokasi` varchar(500) NOT NULL,
-  `waktu_mulai` time NOT NULL,
-  `waktu_selesai` time NOT NULL,
+  `waktu_mulai` datetime NOT NULL,
+  `waktu_selesai` datetime NOT NULL,
   `budget` decimal(15,2) DEFAULT NULL,
   `pengeluaran` decimal(15,2) DEFAULT NULL,
-  `sisa` decimal(15,2) DEFAULT NULL
+  `sisa` decimal(15,2) DEFAULT NULL,
+  `catatan` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `tanggal`
+-- Dumping data for table `kegiatan`
 --
 
-CREATE TABLE `tanggal` (
-  `id_tanggal` int(8) NOT NULL,
-  `tanggal` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `kegiatan` (`id_kegiatan`, `tanggal`, `id_jenis`, `id_user`, `id_divisi`, `kegiatan`, `lokasi`, `waktu_mulai`, `waktu_selesai`, `budget`, `pengeluaran`, `sisa`, `catatan`) VALUES
+(1, '2024-12-09', 4, 2, 2, 'Makan Bersama', 'Warung Makan', '2024-12-09 15:00:00', '2024-12-09 16:00:00', 20000.00, 15000.00, 0.00, 0);
 
 -- --------------------------------------------------------
 
@@ -81,11 +100,11 @@ CREATE TABLE `tanggal` (
 --
 
 CREATE TABLE `user` (
-  `id_user` int(11) NOT NULL,
+  `id_user` int(8) NOT NULL,
   `id_divisi` int(8) NOT NULL,
-  `nm_user` varchar(100) NOT NULL,
-  `username` varchar(20) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `nm_user` varchar(500) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(50) NOT NULL,
   `role` enum('pegawai','admin') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -94,8 +113,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id_user`, `id_divisi`, `nm_user`, `username`, `password`, `role`) VALUES
-(1, 1, 'Novriyan', 'admin', 'admin', 'admin'),
-(2, 2, 'Pegawai', 'pegawai', 'pegawai', 'pegawai');
+(1, 5, 'Novriyan', 'admin', 'admin', 'admin'),
+(2, 2, 'Pegawai Pertanian', 'pertanian', 'pertanian', 'pegawai');
 
 --
 -- Indexes for dumped tables
@@ -108,19 +127,19 @@ ALTER TABLE `divisi`
   ADD PRIMARY KEY (`id_divisi`);
 
 --
+-- Indexes for table `jenis`
+--
+ALTER TABLE `jenis`
+  ADD PRIMARY KEY (`id_jenis`);
+
+--
 -- Indexes for table `kegiatan`
 --
 ALTER TABLE `kegiatan`
   ADD PRIMARY KEY (`id_kegiatan`),
-  ADD KEY `id_tanggal` (`id_tanggal`,`id_user`,`id_divisi`),
-  ADD KEY `id_divisi` (`id_divisi`),
-  ADD KEY `id_user` (`id_user`);
-
---
--- Indexes for table `tanggal`
---
-ALTER TABLE `tanggal`
-  ADD PRIMARY KEY (`id_tanggal`);
+  ADD KEY `id_jenis` (`id_jenis`,`id_user`,`id_divisi`),
+  ADD KEY `id_user` (`id_user`),
+  ADD KEY `id_divisi` (`id_divisi`);
 
 --
 -- Indexes for table `user`
@@ -140,16 +159,22 @@ ALTER TABLE `divisi`
   MODIFY `id_divisi` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `jenis`
+--
+ALTER TABLE `jenis`
+  MODIFY `id_jenis` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `kegiatan`
 --
 ALTER TABLE `kegiatan`
-  MODIFY `id_kegiatan` int(8) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_kegiatan` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_user` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -159,9 +184,9 @@ ALTER TABLE `user`
 -- Constraints for table `kegiatan`
 --
 ALTER TABLE `kegiatan`
-  ADD CONSTRAINT `kegiatan_ibfk_1` FOREIGN KEY (`id_divisi`) REFERENCES `divisi` (`id_divisi`),
-  ADD CONSTRAINT `kegiatan_ibfk_2` FOREIGN KEY (`id_tanggal`) REFERENCES `tanggal` (`id_tanggal`),
-  ADD CONSTRAINT `kegiatan_ibfk_3` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`);
+  ADD CONSTRAINT `kegiatan_ibfk_1` FOREIGN KEY (`id_jenis`) REFERENCES `jenis` (`id_jenis`),
+  ADD CONSTRAINT `kegiatan_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`),
+  ADD CONSTRAINT `kegiatan_ibfk_3` FOREIGN KEY (`id_divisi`) REFERENCES `divisi` (`id_divisi`);
 
 --
 -- Constraints for table `user`
