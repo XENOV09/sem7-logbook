@@ -179,21 +179,11 @@
                     <i class="fas fa-book"></i>Menu Utama
                 </a>
                 <ul class="list-unstyled navbar__sub-list">
-                    <li><a href="logbook.php">Logbook</a></li>
+                    <li><a href="kegiatan.php">Logbook</a></li>
                 </ul>
             </li>
 
             <!-- Kelola Data -->
-            <li class="has-sub">
-                <a class="js-arrow">
-                    <i class="fas fa-gear"></i>Kelola Data
-                </a>
-                <ul class="list-unstyled navbar__sub-list">
-                    <li><a href="user.php">Pengguna Terdaftar</a></li>
-                    <li><a href="divisi.php">Manajemen Divisi</a></li>
-                </ul>
-            </li>
-        </ul>
     </aside>
         <!-- END HEADER MOBILE-->
 

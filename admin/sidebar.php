@@ -179,7 +179,7 @@
                     <i class="fas fa-book"></i>Menu Utama
                 </a>
                 <ul class="list-unstyled navbar__sub-list">
-                    <li><a href="logbook.php">Logbook</a></li>
+                    <li><a href="kegiatan.php">Logbook</a></li>
                 </ul>
             </li>
 

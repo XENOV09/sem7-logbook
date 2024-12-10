@@ -120,26 +120,41 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                         <!-- Filter User dan Tanggal -->
                         <form method="POST" class="mb-3">
                             <div class="row">
-                                <div class="col-md-3 mb-2">
-                                    <select name="id_user" class="form-control">
-                                        <option value="">Pilih User</option>
+                                <!-- Tombol Search -->
+                                <div class="col-md-4 mb-2">
+                                    <label for="search">Cari Kegiatan</label>
+                                    <input type="text" name="search" class="form-control" placeholder="Cari Kegiatan" value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>">
+                                </div>
+
+                                <!-- Filter User -->
+                                <div class="col-md-2 mb-2">
+                                    <label for="id_user">Pilih User</label>
+                                    <select name="id_user" class="form-control" id="id_user">
+                                        <option value="">Semua</option>
                                         <?php while ($user = mysqli_fetch_assoc($result_user_filter)) { ?>
                                             <option value="<?php echo $user['id_user']; ?>" <?php echo ($id_user_filter == $user['id_user']) ? 'selected' : ''; ?>><?php echo $user['nm_user']; ?></option>
                                         <?php } ?>
                                     </select>
                                 </div>
-                                <div class="col-md-3 mb-2">
-                                    <input type="date" name="tanggal_awal" class="form-control" value="<?php echo $tanggal_awal; ?>" placeholder="Tanggal Awal">
+
+                                <!-- Filter Tanggal Awal -->
+                                <div class="col-md-2 mb-2">
+                                    <label for="tanggal_awal">Tanggal Awal</label>
+                                    <input type="date" name="tanggal_awal" class="form-control" value="<?php echo $tanggal_awal; ?>" placeholder="Tanggal Awal" id="tanggal_awal">
                                 </div>
-                                <div class="col-md-3 mb-2">
-                                    <input type="date" name="tanggal_akhir" class="form-control" value="<?php echo $tanggal_akhir; ?>" placeholder="Tanggal Akhir">
+
+                                <!-- Filter Tanggal Akhir -->
+                                <div class="col-md-2 mb-2">
+                                    <label for="tanggal_akhir">Tanggal Akhir</label>
+                                    <input type="date" name="tanggal_akhir" class="form-control" value="<?php echo $tanggal_akhir; ?>" placeholder="Tanggal Akhir" id="tanggal_akhir">
                                 </div>
-                                <div class="col-md-3 mb-2">
+
+                                <!-- Tombol Filter -->
+                                <div class="col-md-2 mb-2 d-flex align-items-end">
                                     <button type="submit" class="btn btn-success w-100">Filter</button>
                                 </div>
                             </div>
                         </form>
-
 
                         <!-- Tabel untuk menampilkan data kegiatan -->
                         <div class="card">
@@ -167,13 +182,43 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                 <th>Budget</th>
                                                 <th>Pengeluaran</th>
                                                 <th>Sisa</th>
+                                                <th>Catatan</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                                $no = 1; // Mulai nomor urut dari 1
-                                                while($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
+                                                $search = isset($_POST['search']) ? $_POST['search'] : '';
+                                                $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
+                                                $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
+                                                $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
+
+                                                // Query dasar untuk mengambil kegiatan
+                                                $sql_kegiatan = "
+                                                    SELECT k.*, j.jenis, u.nm_user
+                                                    FROM kegiatan k
+                                                    JOIN jenis j ON j.id_jenis = k.id_jenis
+                                                    JOIN user u ON u.id_user = k.id_user
+                                                    WHERE k.id_divisi = '$id_divisi_user'";
+
+                                                // Jika ada keyword pencarian
+                                                if ($search) {
+                                                    $sql_kegiatan .= " AND (k.kegiatan LIKE '%$search%' OR u.nm_user LIKE '%$search%' OR j.jenis LIKE '%$search%' OR k.lokasi LIKE '%$search%')";
+                                                }
+
+                                                // Filter berdasarkan tanggal dan user
+                                                if ($tanggal_awal && $tanggal_akhir) {
+                                                    $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+                                                }
+
+                                                if ($id_user_filter) {
+                                                    $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
+                                                }
+
+                                                // Eksekusi query
+                                                $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
+                                                $no = 1;
+                                                while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
                                             ?>
                                             <tr>
                                                 <td><?php echo $no++; ?></td> <!-- Menampilkan nomor urut otomatis -->
@@ -187,6 +232,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                 <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["budget"], 0, ',', '.'); ?></td>
                                                 <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["pengeluaran"], 0, ',', '.'); ?></td>
                                                 <td style="white-space: nowrap;">Rp <?php echo number_format($row_kegiatan["sisa"], 0, ',', '.'); ?></td>
+                                                <td><?php echo $row_kegiatan["catatan"]; ?></td>
                                                 <td>
                                                     <div class="btn-group" role="group" aria-label="Basic example">
                                                     <a href="surat_masuk_edit.php?id=<?php echo $row_kegiatan["id_kegiatan"]?>" class="btn btn-sm btn-success"><i class="bx bx-pencil"></i> Edit</a>

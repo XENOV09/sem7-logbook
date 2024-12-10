@@ -76,7 +76,7 @@ if (isset($_POST["submit"])) {
                     <div class="login-content">
                         <div class="login-logo">
                             <a href="#">
-                                <img src="images/icon/logo.png" alt="CoolAdmin">
+                                <img src="images/icon/icon_mobile.png" alt="CoolAdmin">
                             </a>
                         </div>
                         <div class="login-form">
