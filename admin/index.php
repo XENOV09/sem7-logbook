@@ -2,10 +2,11 @@
 session_start();
 include "../koneksi.php";
 
-if (!isset($_SESSION['id_user'])) {
-    header("Location: ../login.php");
+if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'admin') {
+    header("Location: logout.php");
     exit();
 }
+
 
 // Query untuk menghitung jumlah entri di setiap tabel
 $user_query = "SELECT COUNT(*) AS count FROM user";

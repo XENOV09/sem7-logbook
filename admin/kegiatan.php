@@ -3,8 +3,8 @@ session_start();
 include "../koneksi.php";
 
 // Cek apakah user sudah login
-if (!isset($_SESSION['id_user'])) {
-    header("Location: ../login.php");
+if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'admin') {
+    header("Location: logout.php");
     exit();
 }
 
@@ -85,6 +85,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
     <link href="../vendor/slick/slick.css" rel="stylesheet" media="all">
     <link href="../vendor/select2/select2.min.css" rel="stylesheet" media="all">
     <link href="../vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
+    <link href="../vendor/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 
     <!-- Main CSS-->
     <link href="../css/theme.css" rel="stylesheet" media="all">
@@ -97,6 +98,9 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- Untuk fixed header -->
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css">
+    <!-- Include CSS untuk DataTables dan Buttons -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
 
 
 
@@ -168,14 +172,14 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                 <!-- Menambahkan tombol "Tambah Kegiatan" di atas kanan tabel -->
                                 <div class="row mb-3">
                                     <div class="col-lg-12 text-end">
-                                        <a href="tambah_kegiatan.php" class="btn btn-primary"><i class="bx bx-plus"></i> Tambah Kegiatan</a>
+                                        <a href="kegiatan_tambah.php" class="btn btn-primary"><i class="bx bx-plus"></i> Tambah Kegiatan</a>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <div class="table-responsive table--no-card m-b-30">
                                             <!-- Ganti ID tabel agar sesuai dengan DataTables -->
-                                            <table id="kegiatanTable" class="table table-borderless table-striped table-earning">
+                                            <table id="kegiatanTable" class="table table-borderless table-earning">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
@@ -242,8 +246,8 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                         <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
                                                         <td><?php echo $row_kegiatan['catatan']; ?></td>
                                                         <td>
-                                                            <a href="surat_masuk_edit.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
-                                                            <a href="surat_masuk_hapus.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                                                            <a href="kegiatan_edit.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
+                                                            <a href="kegiatan_hapus.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
                                                         </td>
                                                     </tr>
                                                     <?php } ?>
@@ -279,36 +283,116 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
     <script src="../vendor/chartjs/Chart.bundle.min.js"></script>
     <script src="../vendor/select2/select2.min.js"></script>
 
+    <!-- Main JS-->
+    <script src="../js/main.js"></script>
+
     <!-- Script untuk fixed header -->
     <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
     <!-- Tambahkan jQuery (wajib) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Tambahkan DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <!-- Main JS-->
-    <script src="../js/main.js"></script>
+    <!-- DataTables Buttons JS -->
+    <script src="../vendor/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="../vendor/datatable/js/dataTables.bootstrap5.min.js"></script>
+
     <!-- Agar Teks tidak berubah jadi link -->
     <style>
         a {
             text-decoration: none;
         }
     </style>
-    <script>
-        $(document).ready(function() {
-            $('#kegiatanTable').DataTable({
-                "scrollX": true,          // Aktifkan pengguliran horizontal
-                "paging": true,           // Aktifkan pagination
-                "searching": false,       // Aktifkan pencarian
-                "ordering": true,         // Aktifkan pengurutan
-                "info": true,             // Tampilkan info jumlah data
-                "lengthChange": true,     // Pilihan jumlah data per halaman
-                "pageLength": 10,         // Banyaknya data per halaman
-                "fixedColumns": {
-                    leftColumns: 1,       // Buat kolom pertama tetap statis
-                    rightColumns: 1       // Buat kolom terakhir tetap statis
+
+<script>
+    $(document).ready(function() {
+        $('#kegiatanTable').DataTable({
+            dom: 'Bfrtip',  // Menambahkan area untuk tombol
+            buttons: [
+                
+                //'copy',  // Menyalin data tabel
+                //'csv',   // Mengekspor ke CSV
+                //'excel', // Mengekspor ke Excel
+                {
+                    extend: 'pdf',  // Tombol untuk mengekspor ke PDF
+                    text: 'PDF',
+                    orientation: 'landscape',  // Orientasi halaman, bisa 'portrait' atau 'landscape'
+                    pageSize: 'A4',            // Ukuran halaman, bisa 'A4', 'letter', dll.
+                    customize: function(doc) {
+                        // Menyesuaikan tampilan PDF
+                        doc.styles = {
+                            // Menyesuaikan font pada seluruh dokumen
+                            body: {
+                                fontSize: 10,    // Ukuran font untuk isi dokumen
+                                font: 'TimesNewRoman',    // Jenis font
+                                color: 'black'    // Warna teks
+                            },
+                            // Menyesuaikan font untuk header tabel
+                            tableHeader: {
+                                bold: true,      // Menebalkan font header
+                                fontSize: 12,    // Ukuran font header
+                                color: 'white',   // Warna teks header
+                                fillColor: '#4CAF50' // Warna latar belakang header
+                            },
+                            // Menyesuaikan font untuk data tabel
+                            tableCell: {
+                                fontSize: 10,    // Ukuran font sel tabel
+                                color: 'black'   // Warna teks dalam tabel
+                            }
+                        };
+
+                        // Menghapus kolom Action pada PDF
+                        var rowCount = doc.content[1].table.body.length;
+                        for (var i = 0; i < rowCount; i++) {
+                            // Hapus kolom terakhir (kolom Action)
+                            doc.content[1].table.body[i].splice(12, 1); // Indeks kolom Action adalah 12
+                        }
+
+                        // Menambahkan header khusus ke dalam PDF
+                        doc['header'] = function() {
+                            return {
+                                text: 'Laporan Kegiatan',
+                                alignment: 'center',
+                                fontSize: 14,
+                                bold: true,
+                                margin: [0, 10]
+                            };
+                        };
+
+                        // Menambahkan footer ke dalam PDF
+                        doc['footer'] = function(currentPage, pageCount) {
+                            return {
+                                text: currentPage + ' of ' + pageCount,
+                                alignment: 'center',
+                                fontSize: 8,
+                                margin: [0, 0, 0, 10]
+                            };
+                        };
+                    }
+                },
+                {
+                    extend: 'print',  // Tombol untuk mencetak tabel
+                    text: 'Print',
+                    customize: function(win) {
+                        // Menyembunyikan kolom Action di Print
+                        $(win.document.body).find('th:nth-child(13), td:nth-child(13)').css('display', 'none');
+                    }
                 }
-            });
+            ],
+            "scrollX": true,          // Aktifkan pengguliran horizontal
+            "paging": false,           // Aktifkan pagination
+            "searching": false,       // Aktifkan pencarian
+            "ordering": true,         // Aktifkan pengurutan
+            "info": true,             // Tampilkan info jumlah data
+            "lengthChange": false,     // Pilihan jumlah data per halaman
+            "pageLength": 10,         // Banyaknya data per halaman
+            "fixedColumns": {
+                leftColumns: 0,       // Buat kolom pertama tetap statis
+                rightColumns: 0       // Buat kolom terakhir tetap statis
+            }
         });
-    </script>
+    });
+</script>
+
+
 </body>
 </html>
