@@ -44,8 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
-
 // Query untuk mendapatkan data jenis kegiatan
 $jenis_query = "SELECT * FROM jenis";
 $jenis_result = mysqli_query($conn, $jenis_query);

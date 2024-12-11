@@ -3,8 +3,8 @@ session_start();
 include "../koneksi.php";
 
 // Cek apakah user sudah login
-if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'admin') {
-    header("Location: logout.php");
+if (!isset($_SESSION['id_user'])) {
+    header("Location: ../login.php");
     exit();
 }
 
@@ -26,32 +26,25 @@ $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
 $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
 $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
 
-// Query untuk mendapatkan kegiatan yang sesuai dengan id_divisi user dan tanggal filter
+// Filter divisi dan parameter lainnya
+$id_divisi_filter = isset($_POST['id_divisi']) ? $_POST['id_divisi'] : ''; // Menangkap nilai divisi filter dari form
+
+// Query dasar
 $sql_kegiatan = "
-    SELECT k.*, j.jenis, u.nm_user
+    SELECT k.*, j.jenis, u.nm_user, d.nm_divisi
     FROM kegiatan k
     JOIN jenis j ON j.id_jenis = k.id_jenis
     JOIN user u ON u.id_user = k.id_user
-    WHERE k.id_divisi = '$id_divisi_user'";
-
-if ($tanggal_awal && $tanggal_akhir) {
-    $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
-} elseif ($tanggal_awal) {
-    $sql_kegiatan .= " AND k.tanggal >= '$tanggal_awal'";
-} elseif ($tanggal_akhir) {
-    $sql_kegiatan .= " AND k.tanggal <= '$tanggal_akhir'";
-}
-
-if ($id_user_filter) {
-    $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
-}
+    JOIN divisi d ON d.id_divisi = k.id_divisi"; // Pastikan divisi ditarik
 
 
+// Eksekusi query
 $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
+
 $jml_logbook = mysqli_num_rows($result_kegiatan);
 
 // Ambil daftar user untuk dropdown (dengan filter id_divisi)
-$result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHERE id_divisi = '$id_divisi_user'");
+$result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
 ?>
 
 <!DOCTYPE html>
@@ -131,9 +124,24 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                         <form method="POST" class="mb-3">
                             <div class="row">
                                 <!-- Tombol Search -->
-                                <div class="col-md-4 mb-2">
+                                <div class="col-md-2 mb-2">
                                     <label for="search">Cari Kegiatan</label>
                                     <input type="text" name="search" class="form-control" placeholder="Cari Kegiatan" value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>">
+                                </div>
+                                
+                                <!-- Filter Divisi -->
+                                <div class="col-md-2 mb-2">
+                                    <label for="id_divisi">Pilih Divisi</label>
+                                    <select name="id_divisi" class="form-control" id="id_divisi">
+                                        <option value="">Semua</option>
+                                        <?php 
+                                        // Menambahkan filter divisi
+                                        $result_divisi_filter = mysqli_query($conn, "SELECT id_divisi, nm_divisi FROM divisi");
+                                        while ($divisi = mysqli_fetch_assoc($result_divisi_filter)) {
+                                            ?>
+                                            <option value="<?php echo $divisi['id_divisi']; ?>" <?php echo ($id_divisi_filter == $divisi['id_divisi']) ? 'selected' : ''; ?>><?php echo $divisi['nm_divisi']; ?></option>
+                                        <?php } ?>
+                                    </select>
                                 </div>
 
                                 <!-- Filter User -->
@@ -184,6 +192,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                     <tr>
                                                         <th>No</th>
                                                         <th>Tanggal Kegiatan</th>
+                                                        <th>Divisi</th>
                                                         <th>Oleh</th>
                                                         <th>Jenis Kegiatan</th>
                                                         <th>Kegiatan</th>
@@ -206,12 +215,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                     $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
 
                                                     // Query dasar
-                                                    $sql_kegiatan = "
-                                                        SELECT k.*, j.jenis, u.nm_user 
-                                                        FROM kegiatan k
-                                                        JOIN jenis j ON j.id_jenis = k.id_jenis
-                                                        JOIN user u ON u.id_user = k.id_user
-                                                        WHERE k.id_divisi = '$id_divisi_user'";
+
 
                                                     // Pencarian
                                                     if ($search) {
@@ -221,10 +225,18 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                     // Filter berdasarkan tanggal dan user
                                                     if ($tanggal_awal && $tanggal_akhir) {
                                                         $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+                                                    } elseif ($tanggal_awal) {
+                                                        $sql_kegiatan .= " AND k.tanggal >= '$tanggal_awal'";
+                                                    } elseif ($tanggal_akhir) {
+                                                        $sql_kegiatan .= " AND k.tanggal <= '$tanggal_akhir'";
                                                     }
 
                                                     if ($id_user_filter) {
                                                         $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
+                                                    }
+
+                                                    if ($id_divisi_filter) {
+                                                        $sql_kegiatan .= " AND k.id_divisi = '$id_divisi_filter'";  // Pastikan filter divisi diterapkan di query
                                                     }
 
                                                     // Eksekusi query
@@ -232,24 +244,25 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                     $no = 1;
                                                     while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
                                                     ?>
-                                                    <tr>
-                                                        <td><?php echo $no++; ?></td>
-                                                        <td><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td>
-                                                        <td><?php echo $row_kegiatan['nm_user']; ?></td>
-                                                        <td><?php echo $row_kegiatan['jenis']; ?></td>
-                                                        <td><?php echo $row_kegiatan['kegiatan']; ?></td>
-                                                        <td><?php echo $row_kegiatan['lokasi']; ?></td>
-                                                        <td><?php echo $row_kegiatan['waktu_mulai']; ?></td>
-                                                        <td><?php echo $row_kegiatan['waktu_selesai']; ?></td>
-                                                        <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
-                                                        <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
-                                                        <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
-                                                        <td><?php echo $row_kegiatan['catatan']; ?></td>
-                                                        <td>
-                                                            <a href="kegiatan_edit.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
-                                                            <a href="kegiatan_hapus.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
-                                                        </td>
-                                                    </tr>
+                                                        <tr>
+                                                            <td><?php echo $no++; ?></td>
+                                                            <td><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td>
+                                                            <td><?php echo $row_kegiatan['nm_divisi']; ?></td> <!-- Menampilkan nama divisi -->
+                                                            <td><?php echo $row_kegiatan['nm_user']; ?></td>
+                                                            <td><?php echo $row_kegiatan['jenis']; ?></td>
+                                                            <td><?php echo $row_kegiatan['kegiatan']; ?></td>
+                                                            <td><?php echo $row_kegiatan['lokasi']; ?></td>
+                                                            <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_mulai'])); ?></td>
+                                                            <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_selesai'])); ?></td>
+                                                            <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
+                                                            <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
+                                                            <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
+                                                            <td><?php echo $row_kegiatan['catatan']; ?></td>
+                                                            <td>
+                                                                <a href="kegiatan_edit.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
+                                                                <a href="kegiatan_hapus.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                                                            </td>
+                                                        </tr>
                                                     <?php } ?>
                                                 </tbody>
                                             </table>

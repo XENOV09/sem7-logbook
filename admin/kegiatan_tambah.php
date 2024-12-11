@@ -44,8 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
-
 // Query untuk mendapatkan data jenis kegiatan
 $jenis_query = "SELECT * FROM jenis";
 $jenis_result = mysqli_query($conn, $jenis_query);
@@ -104,7 +102,7 @@ $jenis_result = mysqli_query($conn, $jenis_query);
         <?php include 'header.php'; ?>
 
 
-        <div class="main-content">
+<div class="main-content">
     <div class="section__content section__content--p30">
         <h2 class="title-1">Tambah Kegiatan</h2>
         <form method="POST" action="">

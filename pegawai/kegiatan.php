@@ -28,24 +28,11 @@ $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
 
 // Query untuk mendapatkan kegiatan yang sesuai dengan id_divisi user dan tanggal filter
 $sql_kegiatan = "
-    SELECT k.*, j.jenis, u.nm_user
-    FROM kegiatan k
-    JOIN jenis j ON j.id_jenis = k.id_jenis
-    JOIN user u ON u.id_user = k.id_user
-    WHERE k.id_divisi = '$id_divisi_user'";
-
-if ($tanggal_awal && $tanggal_akhir) {
-    $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
-} elseif ($tanggal_awal) {
-    $sql_kegiatan .= " AND k.tanggal >= '$tanggal_awal'";
-} elseif ($tanggal_akhir) {
-    $sql_kegiatan .= " AND k.tanggal <= '$tanggal_akhir'";
-}
-
-if ($id_user_filter) {
-    $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
-}
-
+SELECT k.*, j.jenis, u.nm_user
+FROM kegiatan k
+JOIN jenis j ON j.id_jenis = k.id_jenis
+JOIN user u ON u.id_user = k.id_user
+WHERE k.id_divisi = '$id_divisi_user'";
 
 $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
 $jml_logbook = mysqli_num_rows($result_kegiatan);
@@ -206,50 +193,42 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                     $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
 
                                                     // Query dasar
-                                                    $sql_kegiatan = "
-                                                        SELECT k.*, j.jenis, u.nm_user 
-                                                        FROM kegiatan k
-                                                        JOIN jenis j ON j.id_jenis = k.id_jenis
-                                                        JOIN user u ON u.id_user = k.id_user
-                                                        WHERE k.id_divisi = '$id_divisi_user'";
 
-                                                    // Pencarian
-                                                    if ($search) {
-                                                        $sql_kegiatan .= " AND (k.kegiatan LIKE '%$search%' OR u.nm_user LIKE '%$search%' OR j.jenis LIKE '%$search%' OR k.lokasi LIKE '%$search%')";
-                                                    }
-
-                                                    // Filter berdasarkan tanggal dan user
-                                                    if ($tanggal_awal && $tanggal_akhir) {
-                                                        $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
-                                                    }
-
-                                                    if ($id_user_filter) {
-                                                        $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
-                                                    }
-
+                                                
+                                                if ($tanggal_awal && $tanggal_akhir) {
+                                                    $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+                                                } elseif ($tanggal_awal) {
+                                                    $sql_kegiatan .= " AND k.tanggal >= '$tanggal_awal'";
+                                                } elseif ($tanggal_akhir) {
+                                                    $sql_kegiatan .= " AND k.tanggal <= '$tanggal_akhir'";
+                                                }
+                                                
+                                                if ($id_user_filter) {
+                                                    $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
+                                                }
                                                     // Eksekusi query
                                                     $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
                                                     $no = 1;
                                                     while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
                                                     ?>
-                                                    <tr>
-                                                        <td><?php echo $no++; ?></td>
-                                                        <td><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td>
-                                                        <td><?php echo $row_kegiatan['nm_user']; ?></td>
-                                                        <td><?php echo $row_kegiatan['jenis']; ?></td>
-                                                        <td><?php echo $row_kegiatan['kegiatan']; ?></td>
-                                                        <td><?php echo $row_kegiatan['lokasi']; ?></td>
-                                                        <td><?php echo $row_kegiatan['waktu_mulai']; ?></td>
-                                                        <td><?php echo $row_kegiatan['waktu_selesai']; ?></td>
-                                                        <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
-                                                        <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
-                                                        <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
-                                                        <td><?php echo $row_kegiatan['catatan']; ?></td>
-                                                        <td>
-                                                            <a href="kegiatan_edit.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
-                                                            <a href="kegiatan_hapus.php?id=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
-                                                        </td>
-                                                    </tr>
+                                                        <tr>
+                                                            <td><?php echo $no++; ?></td>
+                                                            <td><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td>
+                                                            <td><?php echo $row_kegiatan['nm_user']; ?></td>
+                                                            <td><?php echo $row_kegiatan['jenis']; ?></td>
+                                                            <td><?php echo $row_kegiatan['kegiatan']; ?></td>
+                                                            <td><?php echo $row_kegiatan['lokasi']; ?></td>
+                                                            <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_mulai'])); ?></td> <!-- Format waktu_mulai dengan waktu -->
+                                                            <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_selesai'])); ?></td> <!-- Format waktu_selesai dengan waktu -->
+                                                            <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
+                                                            <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
+                                                            <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
+                                                            <td><?php echo $row_kegiatan['catatan']; ?></td>
+                                                            <td>
+                                                                <a href="kegiatan_edit.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
+                                                                <a href="kegiatan_hapus.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                                                            </td>
+                                                        </tr>
                                                     <?php } ?>
                                                 </tbody>
                                             </table>
