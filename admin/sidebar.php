@@ -191,6 +191,7 @@
                 <ul class="list-unstyled navbar__sub-list">
                     <li><a href="user.php">Pengguna Terdaftar</a></li>
                     <li><a href="divisi.php">Manajemen Divisi</a></li>
+                    <li><a href="divisi.php">Manajemen Divisi</a></li>
                 </ul>
             </li>
         </ul>
@@ -233,13 +234,13 @@
                     </a>
                     <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php'])) ? 'style="display:block;"' : '' ?>>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'user.php') ? 'active' : '' ?>">
-                            <a href="user.php">Pengguna Terdaftar</a>
+                            <a href="user.php">Pegawai</a>
                         </li>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'divisi.php') ? 'active' : '' ?>">
                             <a href="divisi.php">Divisi</a>
                         </li>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'jenis_kegiatan.php') ? 'active' : '' ?>">
-                            <a href="divisi.php">Jenis Kegiatan</a>
+                            <a href="jenis.php">Jenis Kegiatan</a>
                         </li>
                     </ul>
                 </li>
@@ -267,4 +268,4 @@
                 parent.classList.toggle('open');
             });
         });
-    </script>
+</script>
