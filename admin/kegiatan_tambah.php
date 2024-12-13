@@ -8,23 +8,18 @@ if (!isset($_SESSION['id_user'])) {
     exit();
 }
 
-// Ambil id_divisi dari user yang login
+// Ambil id_user dari user yang login
 $id_user = $_SESSION['id_user'];
-$user_query = "SELECT id_divisi FROM user WHERE id_user = '$id_user'";
-$user_result = mysqli_query($conn, $user_query);
-$user_data = mysqli_fetch_assoc($user_result);
-$id_divisi = $user_data['id_divisi'];
 
 // Proses simpan data kegiatan jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tanggal = $_POST['tanggal'];
+    $id_divisi = $_POST['id_divisi']; // Ambil id_divisi dari form, bukan dari session
     $waktu_mulai = $_POST['waktu_mulai'];
     $waktu_selesai = $_POST['waktu_selesai'];
-
     $id_jenis = $_POST['id_jenis'];
     $kegiatan = $_POST['kegiatan'];
     $lokasi = $_POST['lokasi'];
-    // Menangani nilai opsional untuk budget dan pengeluaran
     $budget = !empty($_POST['budget']) ? $_POST['budget'] : 0;
     $pengeluaran = !empty($_POST['pengeluaran']) ? $_POST['pengeluaran'] : 0;
     $sisa = $budget - $pengeluaran; // Hitung sisa dari pengeluaran
@@ -47,6 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Query untuk mendapatkan data jenis kegiatan
 $jenis_query = "SELECT * FROM jenis";
 $jenis_result = mysqli_query($conn, $jenis_query);
+
+// Query untuk mendapatkan daftar divisi
+$divisi_query = "SELECT * FROM divisi";
+$divisi_result = mysqli_query($conn, $divisi_query);
 ?>
 
 <!DOCTYPE html>
@@ -91,80 +90,89 @@ $jenis_result = mysqli_query($conn, $jenis_query);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Tambahkan DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
 </head>
+
 <body>
-        <!-- MENU SIDEBAR-->
-        <?php include 'sidebar.php'; ?>
-        <!-- END MENU SIDEBAR-->
+    <?php include 'sidebar.php'; ?>
+    <?php include 'header.php'; ?>
 
-        <!-- PAGE CONTAINER-->
-        <?php include 'header.php'; ?>
-
-
-<div class="main-content">
-    <div class="section__content section__content--p30">
-        <h2 class="title-1">Tambah Kegiatan</h2>
-        <form method="POST" action="">
-            <div class="form-group mb-4">
-                <label for="tanggal">Tanggal Kegiatan</label>
-                <input type="date" id="tanggal" name="tanggal" class="form-control shadow-sm" required>
-            </div>
-
-            <div class="form-group mb-4">
-                <label for="id_jenis">Jenis Kegiatan</label>
-                <select id="id_jenis" name="id_jenis" class="form-control shadow-sm" required>
-                    <option value="">Pilih Jenis Kegiatan</option>
-                    <?php while ($row_jenis = mysqli_fetch_assoc($jenis_result)) { ?>
-                        <option value="<?php echo $row_jenis['id_jenis']; ?>"><?php echo $row_jenis['jenis']; ?></option>
-                    <?php } ?>
-                </select>
-            </div>
-
-            <div class="form-group mb-4">
-                <label for="kegiatan">Kegiatan</label>
-                <textarea id="kegiatan" name="kegiatan" class="form-control shadow-sm" rows="4" required></textarea>
-            </div>
-
-            <div class="form-group mb-4">
-                <label for="lokasi">Lokasi</label>
-                <input type="text" id="lokasi" name="lokasi" class="form-control shadow-sm" required>
-            </div>
-
-            <div class="form-row mb-4">
-                <div class="col">
-                    <label for="waktu_mulai">Waktu Mulai</label>
-                    <input type="datetime-local" id="waktu_mulai" name="waktu_mulai" class="form-control shadow-sm" required>
+    <div class="main-content">
+        <div class="section__content section__content--p30">
+            <h2 class="title-1">Tambah Kegiatan</h2>
+            <form method="POST" action="">
+                <div class="form-group mb-4">
+                    <label for="tanggal">Tanggal Kegiatan</label>
+                    <input type="date" id="tanggal" name="tanggal" class="form-control shadow-sm" required>
                 </div>
-                <div class="col">
-                    <label for="waktu_selesai">Waktu Selesai</label>
-                    <input type="datetime-local" id="waktu_selesai" name="waktu_selesai" class="form-control shadow-sm" required>
-                </div>
-            </div>
 
-            <div class="form-row mb-4">
-                <div class="col">
-                    <label for="budget">Budget</label>
-                    <input type="number" id="budget" name="budget" class="form-control shadow-sm" placeholder="Opsional">
+                <div class="form-group mb-4">
+                    <label for="id_divisi">Divisi</label>
+                    <select id="id_divisi" name="id_divisi" class="form-control shadow-sm" required>
+                        <option value="">Pilih Divisi</option>
+                        <?php while ($row_divisi = mysqli_fetch_assoc($divisi_result)) { ?>
+                            <option value="<?php echo $row_divisi['id_divisi']; ?>">
+                                <?php echo $row_divisi['nm_divisi']; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
                 </div>
-                <div class="col">
-                    <label for="pengeluaran">Pengeluaran</label>
-                    <input type="number" id="pengeluaran" name="pengeluaran" class="form-control shadow-sm" placeholder="Opsional">
+
+                <div class="form-group mb-4">
+                    <label for="id_jenis">Jenis Kegiatan</label>
+                    <select id="id_jenis" name="id_jenis" class="form-control shadow-sm" required>
+                        <option value="">Pilih Jenis Kegiatan</option>
+                        <?php while ($row_jenis = mysqli_fetch_assoc($jenis_result)) { ?>
+                            <option value="<?php echo $row_jenis['id_jenis']; ?>">
+                                <?php echo $row_jenis['jenis']; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
                 </div>
-            </div>
 
-            <div class="form-group mb-4">
-                <label for="catatan">Catatan</label>
-                <textarea id="catatan" name="catatan" class="form-control shadow-sm" rows="4"></textarea>
-            </div>
+                <div class="form-group mb-4">
+                    <label for="kegiatan">Kegiatan</label>
+                    <textarea id="kegiatan" name="kegiatan" class="form-control shadow-sm" rows="4" required></textarea>
+                </div>
 
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary btn-lg shadow-sm px-4">Simpan</button>
-                <a href="kegiatan.php" class="btn btn-secondary btn-lg shadow-sm px-4">Kembali</a>
-            </div>
-        </form>
+                <div class="form-group mb-4">
+                    <label for="lokasi">Lokasi</label>
+                    <input type="text" id="lokasi" name="lokasi" class="form-control shadow-sm" required>
+                </div>
+
+                <div class="form-row mb-4">
+                    <div class="col">
+                        <label for="waktu_mulai">Waktu Mulai</label>
+                        <input type="datetime-local" id="waktu_mulai" name="waktu_mulai" class="form-control shadow-sm" required>
+                    </div>
+                    <div class="col">
+                        <label for="waktu_selesai">Waktu Selesai</label>
+                        <input type="datetime-local" id="waktu_selesai" name="waktu_selesai" class="form-control shadow-sm" required>
+                    </div>
+                </div>
+
+                <div class="form-row mb-4">
+                    <div class="col">
+                        <label for="budget">Budget</label>
+                        <input type="number" id="budget" name="budget" class="form-control shadow-sm" placeholder="Opsional">
+                    </div>
+                    <div class="col">
+                        <label for="pengeluaran">Pengeluaran</label>
+                        <input type="number" id="pengeluaran" name="pengeluaran" class="form-control shadow-sm" placeholder="Opsional">
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="catatan">Catatan</label>
+                    <textarea id="catatan" name="catatan" class="form-control shadow-sm" rows="4"></textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg shadow-sm px-4">Simpan</button>
+                    <a href="kegiatan.php" class="btn btn-secondary btn-lg shadow-sm px-4">Kembali</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
 
     <!-- Jquery JS-->

@@ -8,12 +8,7 @@ if (!isset($_SESSION['id_user'])) {
     exit();
 }
 
-// Ambil id_divisi dari user yang login
 $id_user = $_SESSION['id_user'];
-$user_query = "SELECT id_divisi FROM user WHERE id_user = '$id_user'";
-$user_result = mysqli_query($conn, $user_query);
-$user_data = mysqli_fetch_assoc($user_result);
-$id_divisi = $user_data['id_divisi'];
 
 // Ambil id_kegiatan dari URL untuk edit
 if (isset($_GET['id_kegiatan'])) {
@@ -34,6 +29,7 @@ if (isset($_GET['id_kegiatan'])) {
 // Proses update data kegiatan jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tanggal = $_POST['tanggal'];
+    $id_divisi = $_POST['id_divisi']; // Ambil nilai id_divisi dari form
     $waktu_mulai = $_POST['waktu_mulai'];
     $waktu_selesai = $_POST['waktu_selesai'];
     $id_jenis = $_POST['id_jenis'];
@@ -45,16 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $catatan = $_POST['catatan'];
 
     // Query untuk update data kegiatan
-    $sql = "UPDATE kegiatan SET tanggal='$tanggal', id_jenis='$id_jenis', kegiatan='$kegiatan', lokasi='$lokasi', 
+    $sql = "UPDATE kegiatan SET tanggal='$tanggal', id_divisi='$id_divisi', id_jenis='$id_jenis', kegiatan='$kegiatan', lokasi='$lokasi', 
             waktu_mulai='$waktu_mulai', waktu_selesai='$waktu_selesai', budget='$budget', pengeluaran='$pengeluaran', 
             sisa='$sisa', catatan='$catatan' WHERE id_kegiatan='$id_kegiatan'";
 
     if (mysqli_query($conn, $sql)) {
-        // Jika berhasil, redirect ke halaman kegiatan.php
         header("Location: kegiatan.php");
         exit();
     } else {
-        // Jika gagal, tampilkan pesan error
         echo "Error: " . mysqli_error($conn);
     }
 }
@@ -62,7 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Query untuk mendapatkan data jenis kegiatan
 $jenis_query = "SELECT * FROM jenis";
 $jenis_result = mysqli_query($conn, $jenis_query);
+
+// Query untuk mendapatkan data divisi
+$divisi_query = "SELECT * FROM divisi";
+$divisi_result = mysqli_query($conn, $divisi_query);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -117,77 +116,90 @@ $jenis_result = mysqli_query($conn, $jenis_query);
         <?php include 'header.php'; ?>
 
         <div class="main-content">
-            <div class="section__content section__content--p30">
-                <h2 class="title-1">Edit Kegiatan</h2>
-                <form method="POST" action="">
-                    <div class="form-group mb-4">
-                        <label for="tanggal">Tanggal Kegiatan</label>
-                        <input type="date" id="tanggal" name="tanggal" class="form-control shadow-sm" 
-                               value="<?php echo $kegiatan_data['tanggal']; ?>" required>
-                    </div>
+        <div class="section__content section__content--p30">
+            <h2 class="title-1">Edit Kegiatan</h2>
+            <form method="POST" action="">
+                <div class="form-group mb-4">
+                    <label for="tanggal">Tanggal Kegiatan</label>
+                    <input type="date" id="tanggal" name="tanggal" class="form-control shadow-sm" 
+                           value="<?php echo $kegiatan_data['tanggal']; ?>" required>
+                </div>
 
-                    <div class="form-group mb-4">
-                        <label for="id_jenis">Jenis Kegiatan</label>
-                        <select id="id_jenis" name="id_jenis" class="form-control shadow-sm" required>
-                            <option value="">Pilih Jenis Kegiatan</option>
-                            <?php while ($row_jenis = mysqli_fetch_assoc($jenis_result)) { ?>
-                                <option value="<?php echo $row_jenis['id_jenis']; ?>" 
-                                        <?php echo ($row_jenis['id_jenis'] == $kegiatan_data['id_jenis']) ? 'selected' : ''; ?>>
-                                    <?php echo $row_jenis['jenis']; ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    </div>
+                <div class="form-group mb-4">
+                    <label for="id_divisi">Divisi</label>
+                    <select id="id_divisi" name="id_divisi" class="form-control shadow-sm" required>
+                        <option value="">Pilih Divisi</option>
+                        <?php while ($row_divisi = mysqli_fetch_assoc($divisi_result)) { ?>
+                            <option value="<?php echo $row_divisi['id_divisi']; ?>" 
+                                    <?php echo ($row_divisi['id_divisi'] == $kegiatan_data['id_divisi']) ? 'selected' : ''; ?>>
+                                <?php echo $row_divisi['nm_divisi']; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
 
-                    <div class="form-group mb-4">
-                        <label for="kegiatan">Kegiatan</label>
-                        <textarea id="kegiatan" name="kegiatan" class="form-control shadow-sm" rows="4" required><?php echo $kegiatan_data['kegiatan']; ?></textarea>
-                    </div>
+                <div class="form-group mb-4">
+                    <label for="id_jenis">Jenis Kegiatan</label>
+                    <select id="id_jenis" name="id_jenis" class="form-control shadow-sm" required>
+                        <option value="">Pilih Jenis Kegiatan</option>
+                        <?php while ($row_jenis = mysqli_fetch_assoc($jenis_result)) { ?>
+                            <option value="<?php echo $row_jenis['id_jenis']; ?>" 
+                                    <?php echo ($row_jenis['id_jenis'] == $kegiatan_data['id_jenis']) ? 'selected' : ''; ?>>
+                                <?php echo $row_jenis['jenis']; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
 
-                    <div class="form-group mb-4">
-                        <label for="lokasi">Lokasi</label>
-                        <input type="text" id="lokasi" name="lokasi" class="form-control shadow-sm" 
-                               value="<?php echo $kegiatan_data['lokasi']; ?>" required>
-                    </div>
+                <div class="form-group mb-4">
+                    <label for="kegiatan">Kegiatan</label>
+                    <textarea id="kegiatan" name="kegiatan" class="form-control shadow-sm" rows="4" required><?php echo $kegiatan_data['kegiatan']; ?></textarea>
+                </div>
 
-                    <div class="form-row mb-4">
-                        <div class="col">
-                            <label for="waktu_mulai">Waktu Mulai</label>
-                            <input type="datetime-local" id="waktu_mulai" name="waktu_mulai" class="form-control shadow-sm" 
-                                   value="<?php echo date('Y-m-d\TH:i', strtotime($kegiatan_data['waktu_mulai'])); ?>" required>
-                        </div>
-                        <div class="col">
-                            <label for="waktu_selesai">Waktu Selesai</label>
-                            <input type="datetime-local" id="waktu_selesai" name="waktu_selesai" class="form-control shadow-sm" 
-                                   value="<?php echo date('Y-m-d\TH:i', strtotime($kegiatan_data['waktu_selesai'])); ?>" required>
-                        </div>
-                    </div>
+                <div class="form-group mb-4">
+                    <label for="lokasi">Lokasi</label>
+                    <input type="text" id="lokasi" name="lokasi" class="form-control shadow-sm" 
+                           value="<?php echo $kegiatan_data['lokasi']; ?>" required>
+                </div>
 
-                    <div class="form-row mb-4">
-                        <div class="col">
-                            <label for="budget">Budget</label>
-                            <input type="number" id="budget" name="budget" class="form-control shadow-sm" 
-                                   value="<?php echo $kegiatan_data['budget']; ?>" placeholder="Opsional">
-                        </div>
-                        <div class="col">
-                            <label for="pengeluaran">Pengeluaran</label>
-                            <input type="number" id="pengeluaran" name="pengeluaran" class="form-control shadow-sm" 
-                                   value="<?php echo $kegiatan_data['pengeluaran']; ?>" placeholder="Opsional">
-                        </div>
+                <div class="form-row mb-4">
+                    <div class="col">
+                        <label for="waktu_mulai">Waktu Mulai</label>
+                        <input type="datetime-local" id="waktu_mulai" name="waktu_mulai" class="form-control shadow-sm" 
+                                value="<?php echo date('Y-m-d\TH:i', strtotime($kegiatan_data['waktu_mulai'])); ?>" required>
                     </div>
+                    <div class="col">
+                        <label for="waktu_selesai">Waktu Selesai</label>
+                        <input type="datetime-local" id="waktu_selesai" name="waktu_selesai" class="form-control shadow-sm" 
+                                value="<?php echo date('Y-m-d\TH:i', strtotime($kegiatan_data['waktu_selesai'])); ?>" required>
+                    </div>
+                </div>
 
-                    <div class="form-group mb-4">
-                        <label for="catatan">Catatan</label>
-                        <textarea id="catatan" name="catatan" class="form-control shadow-sm" rows="4"><?php echo $kegiatan_data['catatan']; ?></textarea>
+                <div class="form-row mb-4">
+                    <div class="col">
+                        <label for="budget">Budget</label>
+                        <input type="number" id="budget" name="budget" class="form-control shadow-sm" 
+                               value="<?php echo $kegiatan_data['budget']; ?>" placeholder="Opsional">
                     </div>
+                    <div class="col">
+                        <label for="pengeluaran">Pengeluaran</label>
+                        <input type="number" id="pengeluaran" name="pengeluaran" class="form-control shadow-sm" 
+                               value="<?php echo $kegiatan_data['pengeluaran']; ?>" placeholder="Opsional">
+                    </div>
+                </div>
 
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary btn-lg shadow-sm px-4">Simpan</button>
-                        <a href="kegiatan.php" class="btn btn-secondary btn-lg shadow-sm px-4">Kembali</a>
-                    </div>
-                </form>
-            </div>
+                <div class="form-group mb-4">
+                    <label for="catatan">Catatan</label>
+                    <textarea id="catatan" name="catatan" class="form-control shadow-sm" rows="4"><?php echo $kegiatan_data['catatan']; ?></textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <a href="kegiatan.php" class="btn btn-secondary">Kembali</a>
+                </div>
+            </form>
         </div>
+    </div>
 
 
 

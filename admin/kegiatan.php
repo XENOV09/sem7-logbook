@@ -82,7 +82,6 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
 
     <!-- Main CSS-->
     <link href="../css/theme.css" rel="stylesheet" media="all">
-
     <!-- Link Pack Icon-->
     <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet">
     <!-- Link ke CSS Bootstrap -->
@@ -94,9 +93,6 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
     <!-- Include CSS untuk DataTables dan Buttons -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
-
-
-
 </head>
 <body class="page-top">
     <div class="page-wrapper">
@@ -115,7 +111,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="overview-wrap">
-                                <h2 class="title-1">Logbook - <?php echo $nm_divisi; ?></h2>
+                                <h2 class="title-1">Logbook - Admin</h2>
                                 </div>
                             </div>
                         </div>
@@ -357,7 +353,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
                         var rowCount = doc.content[1].table.body.length;
                         for (var i = 0; i < rowCount; i++) {
                             // Hapus kolom terakhir (kolom Action)
-                            doc.content[1].table.body[i].splice(12, 1); // Indeks kolom Action adalah 12
+                            doc.content[1].table.body[i].splice(13, 1); // Indeks kolom Action adalah 12
                         }
 
                         // Menambahkan header khusus ke dalam PDF
@@ -387,7 +383,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
                     text: 'Print',
                     customize: function(win) {
                         // Menyembunyikan kolom Action di Print
-                        $(win.document.body).find('th:nth-child(13), td:nth-child(13)').css('display', 'none');
+                        $(win.document.body).find('th:nth-child(14), td:nth-child(14)').css('display', 'none');
                     }
                 }
             ],

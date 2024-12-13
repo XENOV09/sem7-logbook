@@ -236,10 +236,10 @@
                             <a href="user.php">Pengguna Terdaftar</a>
                         </li>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'divisi.php') ? 'active' : '' ?>">
-                            <a href="divisi.php">Manajemen Divisi</a>
+                            <a href="divisi.php">Divisi</a>
                         </li>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'jenis_kegiatan.php') ? 'active' : '' ?>">
-                            <a href="divisi.php">Manajemen Jenis Kegiatan</a>
+                            <a href="divisi.php">Jenis Kegiatan</a>
                         </li>
                     </ul>
                 </li>
