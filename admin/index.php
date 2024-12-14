@@ -48,7 +48,7 @@ $jenis_count = mysqli_fetch_assoc($jenis_result)['count'];
     <link href="../vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
 
     <!-- Bootstrap CSS-->
-    <link href="../vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+    <link href="../vendor/bootstrap-5.1.3/css/bootstrap.min.css" rel="stylesheet" media="all">
 
     <!-- Vendor CSS-->
     <link href="../vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
@@ -217,6 +217,11 @@ $jenis_count = mysqli_fetch_assoc($jenis_result)['count'];
 
     <!-- Main JS-->
     <script src="../js/main.js"></script>
+    <style>
+        a {
+            text-decoration: none;
+        }
+    </style>
 
 
 </body>

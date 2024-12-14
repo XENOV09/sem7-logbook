@@ -189,9 +189,9 @@
                     <i class="fas fa-gear"></i>Kelola Data
                 </a>
                 <ul class="list-unstyled navbar__sub-list">
-                    <li><a href="user.php">Pengguna Terdaftar</a></li>
-                    <li><a href="divisi.php">Manajemen Divisi</a></li>
-                    <li><a href="divisi.php">Manajemen Divisi</a></li>
+                    <li><a href="user.php">Pegawai
+                    <li><a href="divisi.php">Divisi</a></li>
+                    <li><a href="jenis.php">Jenis Kegiatan</a></li>
                 </ul>
             </li>
         </ul>

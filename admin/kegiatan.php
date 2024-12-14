@@ -40,7 +40,6 @@ $sql_kegiatan = "
 
 // Eksekusi query
 $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
-
 $jml_logbook = mysqli_num_rows($result_kegiatan);
 
 // Ambil daftar user untuk dropdown (dengan filter id_divisi)
@@ -68,7 +67,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
     <link href="../vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
 
     <!-- Bootstrap CSS-->
-    <link href="../vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+    <link href="../vendor/bootstrap-5.1.3/css/bootstrap.min.css" rel="stylesheet" media="all">
 
     <!-- Vendor CSS-->
     <link href="../vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
@@ -82,17 +81,10 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
 
     <!-- Main CSS-->
     <link href="../css/theme.css" rel="stylesheet" media="all">
-    <!-- Link Pack Icon-->
-    <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <!-- Link ke CSS Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Pack Icon-->
+    <link href="../css/boxicons-2.1.4/css/boxicons.min.css" rel="stylesheet" media="all">
     <!-- Tambahkan DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <!-- Untuk fixed header -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css">
-    <!-- Include CSS untuk DataTables dan Buttons -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
 </head>
 <body class="page-top">
     <div class="page-wrapper">

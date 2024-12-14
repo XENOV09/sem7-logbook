@@ -52,7 +52,7 @@ $role_result = mysqli_query($conn, $role_query);
     <link href="../vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
 
     <!-- Bootstrap CSS -->
-    <link href="../vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+    <link href="../vendor/bootstrap-5.1.3/css/bootstrap.min.css" rel="stylesheet" media="all">
 
     <!-- Vendor CSS -->
     <link href="../vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
@@ -140,6 +140,11 @@ $role_result = mysqli_query($conn, $role_query);
     <script src="../vendor/select2/select2.min.js"></script>
     <!-- Main JS -->
     <script src="../js/main.js"></script>
+    <style>
+        a {
+            text-decoration: none;
+        }
+    </style>
 </body>
 
 </html>
