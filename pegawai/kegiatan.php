@@ -173,6 +173,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                         <th>Budget</th>
                                                         <th>Pengeluaran</th>
                                                         <th>Sisa</th>
+                                                        <th>Lampiran</th>
                                                         <th>Catatan</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -216,6 +217,14 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                             <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
                                                             <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
                                                             <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
+                                                            <td>
+                                                                <?php if ($row_kegiatan["lampiran"]) : ?>
+                                                                    <a href="<?php echo '../images/lampiran/' . $row_kegiatan['lampiran']; ?>" class="btn btn-sm btn-info" target="_blank">
+                                                                        <i class="bx bx-download"></i>Download</a>
+                                                                <?php else : ?>
+                                                                    Tidak Ada Lampiran
+                                                                <?php endif; ?>
+                                                            </td>
                                                             <td><?php echo $row_kegiatan['catatan']; ?></td>
                                                             <td>
                                                                 <a href="kegiatan_edit.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
@@ -312,7 +321,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                         var rowCount = doc.content[1].table.body.length;
                         for (var i = 0; i < rowCount; i++) {
                             // Hapus kolom terakhir (kolom Action)
-                            doc.content[1].table.body[i].splice(12, 1); // Indeks kolom Action adalah 12
+                            doc.content[1].table.body[i].splice(13, 1); // Indeks kolom Action adalah 12
                         }
 
                         // Menambahkan header khusus ke dalam PDF
@@ -342,7 +351,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                     text: 'Print',
                     customize: function(win) {
                         // Menyembunyikan kolom Action di Print
-                        $(win.document.body).find('th:nth-child(13), td:nth-child(13)').css('display', 'none');
+                        $(win.document.body).find('th:nth-child(14), td:nth-child(14)').css('display', 'none');
                     }
                 }
             ],

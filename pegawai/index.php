@@ -216,6 +216,11 @@ $jenis_count = mysqli_fetch_assoc($jenis_result)['count'];
 
     <!-- Main JS-->
     <script src="../js/main.js"></script>
+    <style>
+        a {
+            text-decoration: none;
+        }
+    </style>
 
 
 </body>

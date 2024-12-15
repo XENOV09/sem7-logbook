@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 10, 2024 at 08:53 AM
+-- Generation Time: Dec 15, 2024 at 05:15 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -83,15 +83,16 @@ CREATE TABLE `kegiatan` (
   `budget` decimal(15,2) DEFAULT NULL,
   `pengeluaran` decimal(15,2) DEFAULT NULL,
   `sisa` decimal(15,2) DEFAULT NULL,
-  `catatan` int(11) NOT NULL
+  `lampiran` varchar(500) DEFAULT NULL,
+  `catatan` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `kegiatan`
 --
 
-INSERT INTO `kegiatan` (`id_kegiatan`, `tanggal`, `id_jenis`, `id_user`, `id_divisi`, `kegiatan`, `lokasi`, `waktu_mulai`, `waktu_selesai`, `budget`, `pengeluaran`, `sisa`, `catatan`) VALUES
-(1, '2024-12-09', 4, 2, 2, 'Makan Bersama', 'Warung Makan', '2024-12-09 15:00:00', '2024-12-09 16:00:00', 20000.00, 15000.00, 0.00, 0);
+INSERT INTO `kegiatan` (`id_kegiatan`, `tanggal`, `id_jenis`, `id_user`, `id_divisi`, `kegiatan`, `lokasi`, `waktu_mulai`, `waktu_selesai`, `budget`, `pengeluaran`, `sisa`, `lampiran`, `catatan`) VALUES
+(10, '2024-12-11', 2, 2, 2, 'Survey Kesuburan Tanah', 'Sawah', '2024-12-11 19:00:00', '2024-12-12 19:00:00', 15000.00, 30000.00, -15000.00, 'Netzach EP5 1-1.png', 'Pakai uang sendiri');
 
 -- --------------------------------------------------------
 
@@ -156,7 +157,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `divisi`
 --
 ALTER TABLE `divisi`
-  MODIFY `id_divisi` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_divisi` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `jenis`
@@ -168,13 +169,13 @@ ALTER TABLE `jenis`
 -- AUTO_INCREMENT for table `kegiatan`
 --
 ALTER TABLE `kegiatan`
-  MODIFY `id_kegiatan` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_kegiatan` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_user` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables

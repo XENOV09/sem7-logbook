@@ -9,6 +9,8 @@ if (!isset($_SESSION['id_user'])) {
 }
 
 $id_user = $_SESSION['id_user'];
+$error_message = '';
+$max_file_size = 2 * 1024 * 1024;
 
 // Ambil id_kegiatan dari URL untuk edit
 if (isset($_GET['id_kegiatan'])) {
@@ -39,11 +41,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pengeluaran = !empty($_POST['pengeluaran']) ? $_POST['pengeluaran'] : 0;
     $sisa = $budget - $pengeluaran; // Hitung sisa dari pengeluaran
     $catatan = $_POST['catatan'];
+    $lampiran = $_FILES['lampiran']['name'];
+
+    // Proses upload file lampiran
+    $lampiran = null; // Default null jika tidak ada file yang diupload
+    $error_message = ""; // Variabel untuk pesan error ukuran file  
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Validasi ukuran file (maksimum 2MB)
+        if (isset($_FILES['lampiran']) && $_FILES['lampiran']['error'] === UPLOAD_ERR_OK) {
+            $file_size = $_FILES['lampiran']['size']; // Ukuran file dalam byte
+            $max_size = 2 * 1024 * 1024; // Maksimum ukuran file 2MB dalam byte
+    
+            if ($file_size > $max_size) {
+                $error_message = "Ukuran file melebihi 2MB!";
+            } else {
+                $target_dir = "../images/lampiran/";
+                $file_name = basename($_FILES['lampiran']['name']);
+                $target_file = $target_dir . $file_name;
+                $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    
+                // Validasi tipe file (hanya izinkan file tertentu)
+                $allowed_types = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+                if (in_array($file_type, $allowed_types)) {
+                    // Pindahkan file ke folder tujuan
+                    if (move_uploaded_file($_FILES['lampiran']['tmp_name'], $target_file)) {
+                        $lampiran = $file_name; // Simpan nama file ke database
+                    } else {
+                        echo "Error: Gagal mengupload file.";
+                        exit();
+                    }
+                } else {
+                    echo "Error: Tipe file tidak diizinkan.";
+                    exit();
+                }
+            }
+        }
+    }
 
     // Query untuk update data kegiatan
+    if (empty($error_message)) {
     $sql = "UPDATE kegiatan SET tanggal='$tanggal', id_divisi='$id_divisi', id_jenis='$id_jenis', kegiatan='$kegiatan', lokasi='$lokasi', 
             waktu_mulai='$waktu_mulai', waktu_selesai='$waktu_selesai', budget='$budget', pengeluaran='$pengeluaran', 
-            sisa='$sisa', catatan='$catatan' WHERE id_kegiatan='$id_kegiatan'";
+            sisa='$sisa', lampiran='$lampiran', catatan='$catatan' WHERE id_kegiatan='$id_kegiatan'";
 
     if (mysqli_query($conn, $sql)) {
         header("Location: kegiatan.php");
@@ -51,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo "Error: " . mysqli_error($conn);
     }
+}
 }
 
 // Query untuk mendapatkan data jenis kegiatan
@@ -110,8 +150,8 @@ $divisi_result = mysqli_query($conn, $divisi_query);
         <div class="main-content">
         <div class="section__content section__content--p30">
             <h2 class="title-1">Edit Kegiatan</h2>
-            <form method="POST" action="">
-                <div class="form-group mb-4">
+            <form method="POST" enctype="multipart/form-data">
+            <div class="form-group mb-4">
                     <label for="tanggal">Tanggal Kegiatan</label>
                     <input type="date" id="tanggal" name="tanggal" class="form-control shadow-sm" 
                            value="<?php echo $kegiatan_data['tanggal']; ?>" required>
@@ -179,6 +219,15 @@ $divisi_result = mysqli_query($conn, $divisi_query);
                                value="<?php echo $kegiatan_data['pengeluaran']; ?>" placeholder="Opsional">
                     </div>
                 </div>
+
+                <div class="form-group mb-4">
+                    <label for="lampiran">Lampiran</label>
+                    <input type="file" id="lampiran" name="lampiran" accept=".pdf,.png,.jpg,.jpeg" class="form-control shadow-sm">
+                    <small class="form-text text-muted">File yang diizinkan: JPG, JPEG, PNG, PDF. Maksimal 2MB</small>
+                    <?php if (!empty($error_message)) { ?>
+                        <div class="text-danger mt-2"> <?php echo $error_message; ?> </div>
+                    <?php } ?>
+                </div> 
 
                 <div class="form-group mb-4">
                     <label for="catatan">Catatan</label>

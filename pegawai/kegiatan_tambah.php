@@ -20,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tanggal = $_POST['tanggal'];
     $waktu_mulai = $_POST['waktu_mulai'];
     $waktu_selesai = $_POST['waktu_selesai'];
-
     $id_jenis = $_POST['id_jenis'];
     $kegiatan = $_POST['kegiatan'];
     $lokasi = $_POST['lokasi'];
@@ -29,18 +28,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pengeluaran = !empty($_POST['pengeluaran']) ? $_POST['pengeluaran'] : 0;
     $sisa = $budget - $pengeluaran; // Hitung sisa dari pengeluaran
     $catatan = $_POST['catatan'];
+    $lampiran = $_FILES['lampiran']['name'];
 
-    // Query untuk menyimpan data kegiatan
-    $sql = "INSERT INTO kegiatan (tanggal, id_jenis, id_user, id_divisi, kegiatan, lokasi, waktu_mulai, waktu_selesai, budget, pengeluaran, sisa, catatan) 
-            VALUES ('$tanggal', '$id_jenis', '$id_user', '$id_divisi', '$kegiatan', '$lokasi', '$waktu_mulai', '$waktu_selesai', '$budget', '$pengeluaran', '$sisa', '$catatan')";
+    // Proses upload file lampiran
+    $lampiran = null; // Default null jika tidak ada file yang diupload
+    $error_message = ""; // Variabel untuk pesan error ukuran file  
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Validasi ukuran file (maksimum 2MB)
+        if (isset($_FILES['lampiran']) && $_FILES['lampiran']['error'] === UPLOAD_ERR_OK) {
+            $file_size = $_FILES['lampiran']['size']; // Ukuran file dalam byte
+            $max_size = 2 * 1024 * 1024; // Maksimum ukuran file 2MB dalam byte
+    
+            if ($file_size > $max_size) {
+                $error_message = "Ukuran file melebihi 2MB!";
+            } else {
+                $target_dir = "../images/lampiran/";
+                $file_name = basename($_FILES['lampiran']['name']);
+                $target_file = $target_dir . $file_name;
+                $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    
+                // Validasi tipe file (hanya izinkan file tertentu)
+                $allowed_types = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+                if (in_array($file_type, $allowed_types)) {
+                    // Pindahkan file ke folder tujuan
+                    if (move_uploaded_file($_FILES['lampiran']['tmp_name'], $target_file)) {
+                        $lampiran = $file_name; // Simpan nama file ke database
+                    } else {
+                        echo "Error: Gagal mengupload file.";
+                        exit();
+                    }
+                } else {
+                    echo "Error: Tipe file tidak diizinkan.";
+                    exit();
+                }
+            }
+        }
+    }
 
-    if (mysqli_query($conn, $sql)) {
-        // Jika berhasil, redirect ke halaman kegiatan.php
-        header("Location: kegiatan.php");
-        exit();
-    } else {
-        // Jika gagal, tampilkan pesan error
-        echo "Error: " . mysqli_error($conn);
+
+    // Jika tidak ada error, maka lakukan penyimpanan ke database
+    if (empty($error_message)) {
+        // Query untuk menyimpan data kegiatan
+        $sql = "INSERT INTO kegiatan 
+                (tanggal, id_jenis, id_user, id_divisi, kegiatan, lokasi, waktu_mulai, waktu_selesai, budget, pengeluaran, sisa, lampiran, catatan) 
+                VALUES 
+                ('$tanggal', '$id_jenis', '$id_user', '$id_divisi', '$kegiatan', '$lokasi', '$waktu_mulai', '$waktu_selesai', '$budget', '$pengeluaran', '$sisa', '$lampiran', '$catatan')";
+
+        if (mysqli_query($conn, $sql)) {
+            // Jika berhasil, redirect ke halaman kegiatan.php
+            header("Location: kegiatan.php");
+            exit();
+        } else {
+            // Jika gagal, tampilkan pesan error
+            echo "Error: " . mysqli_error($conn);
+        }
     }
 }
 
@@ -97,7 +138,7 @@ $jenis_result = mysqli_query($conn, $jenis_query);
         <div class="main-content">
     <div class="section__content section__content--p30">
         <h2 class="title-1">Tambah Kegiatan</h2>
-        <form method="POST" action="">
+        <form method="POST" action="" enctype="multipart/form-data">
             <div class="form-group mb-4">
                 <label for="tanggal">Tanggal Kegiatan</label>
                 <input type="date" id="tanggal" name="tanggal" class="form-control shadow-sm" required>
@@ -123,7 +164,7 @@ $jenis_result = mysqli_query($conn, $jenis_query);
                 <input type="text" id="lokasi" name="lokasi" class="form-control shadow-sm" required>
             </div>
 
-            <div class="form-row mb-4">
+            <div class="row mb-4">
                 <div class="col">
                     <label for="waktu_mulai">Waktu Mulai</label>
                     <input type="datetime-local" id="waktu_mulai" name="waktu_mulai" class="form-control shadow-sm" required>
@@ -134,7 +175,7 @@ $jenis_result = mysqli_query($conn, $jenis_query);
                 </div>
             </div>
 
-            <div class="form-row mb-4">
+            <div class="row mb-4">
                 <div class="col">
                     <label for="budget">Budget</label>
                     <input type="number" id="budget" name="budget" class="form-control shadow-sm" placeholder="Opsional">
@@ -144,6 +185,15 @@ $jenis_result = mysqli_query($conn, $jenis_query);
                     <input type="number" id="pengeluaran" name="pengeluaran" class="form-control shadow-sm" placeholder="Opsional">
                 </div>
             </div>
+            
+            <div class="form-group mb-4">
+                    <label for="lampiran">Lampiran</label>
+                    <input type="file" id="lampiran" name="lampiran" accept=".pdf,.png,.jpg,.jpeg" class="form-control shadow-sm">
+                    <small class="form-text text-muted">File yang diizinkan: JPG, JPEG, PNG, PDF. Maksimal 2MB</small>
+                    <?php if (!empty($error_message)) { ?>
+                        <div class="text-danger mt-2"> <?php echo $error_message; ?> </div>
+                    <?php } ?>
+                </div>  
 
             <div class="form-group mb-4">
                 <label for="catatan">Catatan</label>
