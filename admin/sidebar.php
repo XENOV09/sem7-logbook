@@ -228,18 +228,18 @@
                 </li>
 
                 <!-- Kelola Data -->
-                <li class="has-sub <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php'])) ? 'active show' : '' ?>">
+                <li class="has-sub <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php', 'jenis.php'])) ? 'active show' : '' ?>">
                     <a class="js-arrow" href="#">
                         <i class="fas fa-gear"></i>Kelola Data
                     </a>
-                    <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php'])) ? 'style="display:block;"' : '' ?>>
+                    <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php', 'jenis.php'])) ? 'style="display:block;"' : '' ?>>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'user.php') ? 'active' : '' ?>">
                             <a href="user.php">Pegawai</a>
                         </li>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'divisi.php') ? 'active' : '' ?>">
                             <a href="divisi.php">Divisi</a>
                         </li>
-                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'jenis_kegiatan.php') ? 'active' : '' ?>">
+                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'jenis.php') ? 'active' : '' ?>">
                             <a href="jenis.php">Jenis Kegiatan</a>
                         </li>
                     </ul>

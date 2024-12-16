@@ -8,12 +8,9 @@ if (!isset($_SESSION['id_user'])) {
     exit();
 }
 
-// Ambil id_user dari session
-$id_user = $_SESSION['id_user'];
-
-// Ambil data pengguna dari tabel user
-$sql_user = "SELECT user.*, divisi.nm_divisi FROM user LEFT JOIN divisi ON user.id_divisi = divisi.id_divisi";
-$result_user = mysqli_query($conn, $sql_user);
+// Ambil data divisi dari tabel divisi
+$sql_jenis = "SELECT * FROM jenis";
+$result_jenis = mysqli_query($conn, $sql_jenis);
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +25,7 @@ $result_user = mysqli_query($conn, $sql_user);
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Manajemen - Pengguna</title>
+    <title>Manajemen - Jenis Kegiatan</title>
 
     <!-- Fontfaces CSS-->
     <link href="../css/font-face.css" rel="stylesheet" media="all">
@@ -66,64 +63,56 @@ $result_user = mysqli_query($conn, $sql_user);
         <!-- PAGE CONTAINER-->
         <?php include 'header.php'; ?>
 
-            <!-- MAIN CONTENT-->
-            <div class="main-content">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="overview-wrap">
-                                <h2 class="title-1">Manajemen - Pengguna</h2>
-                                </div>
+        <!-- MAIN CONTENT-->
+        <div class="main-content">
+            <div class="section__content section__content--p30">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="overview-wrap">
+                                <h2 class="title-1">Manajemen - Jenis Kegiatan</h2>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Tabel untuk menampilkan data kegiatan -->
-                        <div class="card">
-                            <div class="card-body">
-                                <!-- Menambahkan tombol "Tambah Kegiatan" di atas kanan tabel -->
-                                <div class="row mb-3">
-                                    <div class="col-lg-12 text-end">
-                                        <a href="user_tambah.php" class="btn btn-primary"><i class="fa fa-plus"></i> Tambah User</a>
-                                    </div>
+                    <!-- Tabel untuk menampilkan data divisi -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-lg-12 text-end">
+                                    <a href="jenis_tambah.php" class="btn btn-primary"><i class="fa fa-plus"></i> Tambah Jenis Kegiatan</a>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="table-responsive table--no-card m-b-30">
-                                            <!-- Ganti ID tabel agar sesuai dengan DataTables -->
-                                            <table id="kegiatanTable" class="table table-borderless table-earning">
-                                                <thead>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="table-responsive table--no-card m-b-30">
+                                        <table id="kegiatanTable" class="table table-borderless table-earning"  >
+                                            <thead>
                                                 <tr>
-                                                        <th>No</th>
-                                                        <th>Nama</th>
-                                                        <th>Divisi</th>
-                                                        <th>Username</th>
-                                                        <th>Password</th>
-                                                        <th>Role</th>
-                                                        <th>Action</th>
+                                                    <th>No</th>
+                                                    <th>ID Jenis</th>
+                                                    <th style="width: 50%;">Jenis Kegiatan</th>
+                                                    <th style="width: 15%;">Action</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $no = 1;
+                                                while ($row_jenis = mysqli_fetch_assoc($result_jenis)) { 
+                                                ?>
+                                                    <tr>
+                                                        <td><?php echo $no++; ?></td>
+                                                        <td><?php echo $row_jenis['id_jenis']; ?></td>
+                                                        <td><?php echo $row_jenis['jenis']; ?></td>
+                                                        <td>
+                                                            <a href="jenis_edit.php?id_jenis=<?php echo $row_jenis['id_jenis']; ?>" class="btn btn-sm btn-success">Edit</a>
+                                                            <a href="jenis_hapus.php?id_jenis=<?php echo $row_jenis['id_jenis']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus divisi ini?')">Hapus</a>
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php
-                                                    $no = 1;
-                                                    while ($row_user = mysqli_fetch_assoc($result_user)) { 
-                                                    ?>
-                                                        <tr>
-                                                            <td><?php echo $no++; ?></td>
-                                                            <td><?php echo $row_user['nm_user']; ?></td>
-                                                            <td><?php echo $row_user['nm_divisi']; ?></td>
-                                                            <td><?php echo $row_user['username']; ?></td>
-                                                            <td><?php echo $row_user['password']; ?></td>
-                                                            <td><?php echo $row_user['role']; ?></td>
-                                                            <td>
-                                                                <a href="user_edit.php?id_user=<?php echo $row_user['id_user']; ?>" class="btn btn-sm btn-success">Edit</a>
-                                                                <a href="user_hapus.php?id_user=<?php echo $row_user['id_user']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus pengguna ini?')">Hapus</a>
-                                                            </td>
-                                                        </tr>
-                                                    <?php } ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -135,7 +124,6 @@ $result_user = mysqli_query($conn, $sql_user);
         <!-- END MAIN CONTENT-->
         <!-- END PAGE CONTAINER-->
     </div>
-
     <!-- Jquery JS-->
     <script src="../vendor/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap JS-->
@@ -214,7 +202,7 @@ $result_user = mysqli_query($conn, $sql_user);
                         var rowCount = doc.content[1].table.body.length;
                         for (var i = 0; i < rowCount; i++) {
                             // Hapus kolom terakhir (kolom Action)
-                            doc.content[1].table.body[i].splice(6, 1); // Indeks kolom Action dimulai dari 0
+                            doc.content[1].table.body[i].splice(3, 1); // Indeks kolom Action dimulai dari 0
                         }
 
                         // Menambahkan header khusus ke dalam PDF
@@ -243,8 +231,8 @@ $result_user = mysqli_query($conn, $sql_user);
                     extend: 'print',  // Tombol untuk mencetak tabel
                     text: 'Print',
                     customize: function(win) {
-                        // Menyembunyikan kolom Action di Print
-                        $(win.document.body).find('th:nth-child(7), td:nth-child(7)').css('display', 'none');
+                        // Menyembunyikan kolom Action di Print, mulai dari 1
+                        $(win.document.body).find('th:nth-child(4), td:nth-child(4)').css('display', 'none');
                     }
                 }
             ],

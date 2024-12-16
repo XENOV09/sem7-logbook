@@ -25,7 +25,7 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Logbook</title>
+    <title>Manajemen - Divisi</title>
 
     <!-- Fontfaces CSS-->
     <link href="../css/font-face.css" rel="stylesheet" media="all">
@@ -202,7 +202,7 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                         var rowCount = doc.content[1].table.body.length;
                         for (var i = 0; i < rowCount; i++) {
                             // Hapus kolom terakhir (kolom Action)
-                            doc.content[1].table.body[i].splice(6, 1); // Indeks kolom Action dimulai dari 0
+                            doc.content[1].table.body[i].splice(3, 1); // Indeks kolom Action dimulai dari 0
                         }
 
                         // Menambahkan header khusus ke dalam PDF
@@ -231,8 +231,8 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                     extend: 'print',  // Tombol untuk mencetak tabel
                     text: 'Print',
                     customize: function(win) {
-                        // Menyembunyikan kolom Action di Print
-                        $(win.document.body).find('th:nth-child(7), td:nth-child(7)').css('display', 'none');
+                        // Menyembunyikan kolom Action di Print, mulai dari 1
+                        $(win.document.body).find('th:nth-child(4), td:nth-child(4)').css('display', 'none');
                     }
                 }
             ],
