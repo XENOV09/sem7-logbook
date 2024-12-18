@@ -99,7 +99,14 @@ $role_result = mysqli_query($conn, $role_query);
 
                 <div class="form-group mb-4">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control shadow-sm" required>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control shadow-sm" required>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group mb-4">
@@ -145,6 +152,36 @@ $role_result = mysqli_query($conn, $role_query);
             text-decoration: none;
         }
     </style>
+    <style>
+    .input-group .btn {
+        height: 100%;  /* Memastikan tombol mengisi tinggi input */
+        display: flex; /* Membuat tombol fleksibel */
+        align-items: center; /* Menjaga ikon berada di tengah */
+        padding: 0 10px; /* Menambahkan padding untuk tombol */
+    }
+</style>
+
+    <script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+        // Toggle password visibility
+        const type = passwordField.type === 'password' ? 'text' : 'password';
+        passwordField.type = type;
+
+        // Change the eye icon based on the password visibility
+        const icon = this.querySelector('i');
+        if (type === 'password') {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    });
+</script>
+
 </body>
 
 </html>

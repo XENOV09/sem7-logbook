@@ -98,7 +98,6 @@ $result_user = mysqli_query($conn, $sql_user);
                                                         <th>Nama</th>
                                                         <th>Divisi</th>
                                                         <th>Username</th>
-                                                        <th>Password</th>
                                                         <th>Role</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -113,7 +112,6 @@ $result_user = mysqli_query($conn, $sql_user);
                                                             <td><?php echo $row_user['nm_user']; ?></td>
                                                             <td><?php echo $row_user['nm_divisi']; ?></td>
                                                             <td><?php echo $row_user['username']; ?></td>
-                                                            <td><?php echo $row_user['password']; ?></td>
                                                             <td><?php echo $row_user['role']; ?></td>
                                                             <td>
                                                                 <a href="user_edit.php?id_user=<?php echo $row_user['id_user']; ?>" class="btn btn-sm btn-success">Edit</a>
@@ -201,7 +199,7 @@ $result_user = mysqli_query($conn, $sql_user);
                                 bold: true,      // Menebalkan font header
                                 fontSize: 12,    // Ukuran font header
                                 color: 'white',   // Warna teks header
-                                fillColor: '#4CAF50' // Warna latar belakang header
+                                fillColor: '#000000' // Warna latar belakang header
                             },
                             // Menyesuaikan font untuk data tabel
                             tableCell: {
@@ -220,7 +218,7 @@ $result_user = mysqli_query($conn, $sql_user);
                         // Menambahkan header khusus ke dalam PDF
                         doc['header'] = function() {
                             return {
-                                text: 'Laporan Kegiatan',
+                                text: 'Laporan Pengguna',
                                 alignment: 'center',
                                 fontSize: 14,
                                 bold: true,
@@ -239,14 +237,14 @@ $result_user = mysqli_query($conn, $sql_user);
                         };
                     }
                 },
-                {
-                    extend: 'print',  // Tombol untuk mencetak tabel
-                    text: 'Print',
-                    customize: function(win) {
-                        // Menyembunyikan kolom Action di Print
-                        $(win.document.body).find('th:nth-child(7), td:nth-child(7)').css('display', 'none');
-                    }
-                }
+                // {
+                //     extend: 'print',  // Tombol untuk mencetak tabel
+                //     text: 'Print',
+                //     customize: function(win) {
+                //         // Menyembunyikan kolom Action di Print
+                //         $(win.document.body).find('th:nth-child(7), td:nth-child(7)').css('display', 'none');
+                //     }
+                // }
             ],
             "scrollX": false,          // Aktifkan pengguliran horizontal
             "paging": false,           // Aktifkan pagination

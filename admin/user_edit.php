@@ -123,7 +123,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group mb-4">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control shadow-sm" value="<?php echo $user_data['password']; ?>" required>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control shadow-sm" value="<?php echo $user_data['password']; ?>" required>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group mb-4">
@@ -169,6 +176,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-decoration: none;
         }
     </style>
+    <script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+        // Toggle password visibility
+        const type = passwordField.type === 'password' ? 'text' : 'password';
+        passwordField.type = type;
+
+        // Change the eye icon based on the password visibility
+        const icon = this.querySelector('i');
+        if (type === 'password') {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    });
+</script>
+
 </body>
 
 </html>

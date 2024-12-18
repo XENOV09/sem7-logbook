@@ -245,8 +245,11 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
                                                             <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_selesai'])); ?></td>
                                                             <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
                                                             <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
-                                                            <td>Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?></td>
                                                             <td>
+                                                                <span style="color: <?php echo $row_kegiatan['sisa'] < 0 ? 'red' : 'green'; ?>;">
+                                                                    Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?>
+                                                                </span>
+                                                            </td>                                                            <td>
                                                                 <?php if ($row_kegiatan["lampiran"]) : ?>
                                                                     <a href="<?php echo '../images/lampiran/' . $row_kegiatan['lampiran']; ?>" class="btn btn-sm btn-info" target="_blank">
                                                                         <i class="bx bx-download"></i>Download</a>
@@ -341,7 +344,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
                                 bold: true,      // Menebalkan font header
                                 fontSize: 12,    // Ukuran font header
                                 color: 'white',   // Warna teks header
-                                fillColor: '#4CAF50' // Warna latar belakang header
+                                fillColor: '#000000' // Warna latar belakang header
                             },
                             // Menyesuaikan font untuk data tabel
                             tableCell: {
@@ -379,14 +382,14 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
                         };
                     }
                 },
-                {
-                    extend: 'print',  // Tombol untuk mencetak tabel
-                    text: 'Print',
-                    customize: function(win) {
-                        // Menyembunyikan kolom Action di Print
-                        $(win.document.body).find('th:nth-child(15), td:nth-child(15)').css('display', 'none');
-                    }
-                }
+                // {
+                //     extend: 'print',  // Tombol untuk mencetak tabel
+                //     text: 'Print',
+                //     customize: function(win) {
+                //         // Menyembunyikan kolom Action di Print
+                //         $(win.document.body).find('th:nth-child(15), td:nth-child(15)').css('display', 'none');
+                //     }
+                // }
             ],
             "scrollX": true,          // Aktifkan pengguliran horizontal
             "paging": false,           // Aktifkan pagination

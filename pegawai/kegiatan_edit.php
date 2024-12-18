@@ -47,57 +47,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lampiran = $_FILES['lampiran']['name'];
 
     // Proses upload file lampiran
-    $lampiran = null; // Default null jika tidak ada file yang diupload
+    $lampiran = $kegiatan_data['lampiran']; // Gunakan lampiran lama jika tidak ada upload file
     $error_message = ""; // Variabel untuk pesan error ukuran file  
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_FILES['lampiran']) && $_FILES['lampiran']['error'] === UPLOAD_ERR_OK) {
         // Validasi ukuran file (maksimum 2MB)
-        if (isset($_FILES['lampiran']) && $_FILES['lampiran']['error'] === UPLOAD_ERR_OK) {
-            $file_size = $_FILES['lampiran']['size']; // Ukuran file dalam byte
-            $max_size = 2 * 1024 * 1024; // Maksimum ukuran file 2MB dalam byte
-    
-            if ($file_size > $max_size) {
-                $error_message = "Ukuran file melebihi 2MB!";
-            } else {
-                $target_dir = "../images/lampiran/";
-                $file_name = basename($_FILES['lampiran']['name']);
-                $target_file = $target_dir . $file_name;
-                $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-    
-                // Validasi tipe file (hanya izinkan file tertentu)
-                $allowed_types = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
-                if (in_array($file_type, $allowed_types)) {
-                    // Pindahkan file ke folder tujuan
-                    if (move_uploaded_file($_FILES['lampiran']['tmp_name'], $target_file)) {
-                        $lampiran = $file_name; // Simpan nama file ke database
-                    } else {
-                        echo "Error: Gagal mengupload file.";
-                        exit();
-                    }
+        $file_size = $_FILES['lampiran']['size']; // Ukuran file dalam byte
+        $max_size = 2 * 1024 * 1024; // Maksimum ukuran file 2MB dalam byte
+
+        if ($file_size > $max_size) {
+            $error_message = "Ukuran file melebihi 2MB!";
+        } else {
+            $target_dir = "../images/lampiran/";
+            $file_name = basename($_FILES['lampiran']['name']);
+            $target_file = $target_dir . $file_name;
+            $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+            // Validasi tipe file (hanya izinkan file tertentu)
+            $allowed_types = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+            if (in_array($file_type, $allowed_types)) {
+                // Pindahkan file ke folder tujuan
+                if (move_uploaded_file($_FILES['lampiran']['tmp_name'], $target_file)) {
+                    $lampiran = $file_name; // Simpan nama file ke database
                 } else {
-                    echo "Error: Tipe file tidak diizinkan.";
+                    echo "Error: Gagal mengupload file.";
                     exit();
                 }
+            } else {
+                echo "Error: Tipe file tidak diizinkan.";
+                exit();
             }
         }
     }
-    
 
     // Query untuk update data kegiatan, termasuk lampiran
     if (empty($error_message)) {
-    $sql = "UPDATE kegiatan SET tanggal='$tanggal', id_jenis='$id_jenis', kegiatan='$kegiatan', lokasi='$lokasi', 
-            waktu_mulai='$waktu_mulai', waktu_selesai='$waktu_selesai', budget='$budget', pengeluaran='$pengeluaran', 
-            sisa='$sisa', catatan='$catatan', lampiran='$lampiran' WHERE id_kegiatan='$id_kegiatan'";
+        $sql = "UPDATE kegiatan SET tanggal='$tanggal', id_jenis='$id_jenis', kegiatan='$kegiatan', lokasi='$lokasi', 
+                waktu_mulai='$waktu_mulai', waktu_selesai='$waktu_selesai', budget='$budget', pengeluaran='$pengeluaran', 
+                sisa='$sisa', catatan='$catatan', lampiran='$lampiran' WHERE id_kegiatan='$id_kegiatan'";
 
-    if (mysqli_query($conn, $sql)) {
-        // Jika berhasil, redirect ke halaman kegiatan.php
-        header("Location: kegiatan.php");
-        exit();
-    } else {
-        // Jika gagal, tampilkan pesan error
-        echo "Error: " . mysqli_error($conn);
+        if (mysqli_query($conn, $sql)) {
+            // Jika berhasil, redirect ke halaman kegiatan.php
+            header("Location: kegiatan.php");
+            exit();
+        } else {
+            // Jika gagal, tampilkan pesan error
+            echo "Error: " . mysqli_error($conn);
+        }
     }
-}
-
 }
 
 // Query untuk mendapatkan data jenis kegiatan

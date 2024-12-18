@@ -25,7 +25,7 @@ $result_jenis = mysqli_query($conn, $sql_jenis);
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Manajemen - Jenis Kegiatan</title>
+    <title>Manajemen - Jenis Kegiatan   </title>
 
     <!-- Fontfaces CSS-->
     <link href="../css/font-face.css" rel="stylesheet" media="all">
@@ -189,7 +189,7 @@ $result_jenis = mysqli_query($conn, $sql_jenis);
                                 bold: true,      // Menebalkan font header
                                 fontSize: 12,    // Ukuran font header
                                 color: 'white',   // Warna teks header
-                                fillColor: '#4CAF50' // Warna latar belakang header
+                                fillColor: '#000000' // Warna latar belakang header
                             },
                             // Menyesuaikan font untuk data tabel
                             tableCell: {
@@ -208,7 +208,7 @@ $result_jenis = mysqli_query($conn, $sql_jenis);
                         // Menambahkan header khusus ke dalam PDF
                         doc['header'] = function() {
                             return {
-                                text: 'Laporan Kegiatan',
+                                text: 'Laporan Jenis Kegiatan',
                                 alignment: 'center',
                                 fontSize: 14,
                                 bold: true,
@@ -227,14 +227,14 @@ $result_jenis = mysqli_query($conn, $sql_jenis);
                         };
                     }
                 },
-                {
-                    extend: 'print',  // Tombol untuk mencetak tabel
-                    text: 'Print',
-                    customize: function(win) {
-                        // Menyembunyikan kolom Action di Print, mulai dari 1
-                        $(win.document.body).find('th:nth-child(4), td:nth-child(4)').css('display', 'none');
-                    }
-                }
+                // {
+                //     extend: 'print',  // Tombol untuk mencetak tabel
+                //     text: 'Print',
+                //     customize: function(win) {
+                //         // Menyembunyikan kolom Action di Print, mulai dari 1
+                //         $(win.document.body).find('th:nth-child(4), td:nth-child(4)').css('display', 'none');
+                //     }
+                // }
             ],
             "scrollX": false,          // Aktifkan pengguliran horizontal
             "paging": false,           // Aktifkan pagination

@@ -189,7 +189,7 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                                 bold: true,      // Menebalkan font header
                                 fontSize: 12,    // Ukuran font header
                                 color: 'white',   // Warna teks header
-                                fillColor: '#4CAF50' // Warna latar belakang header
+                                fillColor: '#000000' // Warna latar belakang header
                             },
                             // Menyesuaikan font untuk data tabel
                             tableCell: {
@@ -208,7 +208,7 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                         // Menambahkan header khusus ke dalam PDF
                         doc['header'] = function() {
                             return {
-                                text: 'Laporan Kegiatan',
+                                text: 'Laporan Divisi',
                                 alignment: 'center',
                                 fontSize: 14,
                                 bold: true,
@@ -227,14 +227,14 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                         };
                     }
                 },
-                {
-                    extend: 'print',  // Tombol untuk mencetak tabel
-                    text: 'Print',
-                    customize: function(win) {
-                        // Menyembunyikan kolom Action di Print, mulai dari 1
-                        $(win.document.body).find('th:nth-child(4), td:nth-child(4)').css('display', 'none');
-                    }
-                }
+                // {
+                //     extend: 'print',  // Tombol untuk mencetak tabel
+                //     text: 'Print',
+                //     customize: function(win) {
+                //         // Menyembunyikan kolom Action di Print, mulai dari 1
+                //         $(win.document.body).find('th:nth-child(4), td:nth-child(4)').css('display', 'none');
+                //     }
+                // }
             ],
             "scrollX": false,          // Aktifkan pengguliran horizontal
             "paging": false,           // Aktifkan pagination

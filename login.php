@@ -80,23 +80,29 @@ if (isset($_POST["submit"])) {
                             </a>
                         </div>
                         <div class="login-form">
-                            <form action="" method="post">
-                                <div class="form-group">
-                                    <label>Username</label>
-                                    <input class="au-input au-input--full" type="text" id="username" name="username" placeholder="Username" required autofocus>
-                                </div>
-                                <div class="form-group">
-                                    <label>Password</label>
-                                    <input class="au-input au-input--full" type="password" id="password" name="password"  placeholder="Password" required autofocus>
-                                </div>
-                                <button class="au-btn au-btn--block au-btn--green m-b-20" type="submit" name="submit">Masuk</button>
-                                <?php if (!empty($error)) : ?>
-                                        <div class="alert alert-danger text-center" role="alert">
-                                            <?= $error; ?>
-                                        </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
+    <form action="" method="post">
+        <div class="form-group">
+            <label>Username</label>
+            <input class="au-input au-input--full" type="text" id="username" name="username" placeholder="Username" required autofocus>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <div class="password-wrapper" style="position: relative;">
+                <input class="au-input au-input--full" type="password" id="password" name="password" placeholder="Password" required>
+                <span class="toggle-password" onclick="togglePassword()" 
+                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
+                    <i class="fa fa-eye" id="toggle-icon"></i>
+                </span>
+            </div>
+        </div>
+        <button class="au-btn au-btn--block au-btn--green m-b-20" type="submit" name="submit">Masuk</button>
+        <?php if (!empty($error)) : ?>
+            <div class="alert alert-danger text-center" role="alert">
+                <?= $error; ?>
+            </div>
+        <?php endif; ?>
+    </form>
+</div>
                     </div>
                 </div>
             </div>
@@ -126,6 +132,22 @@ if (isset($_POST["submit"])) {
 
     <!-- Main JS-->
     <script src="js/main.js"></script>
+    <script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggle-icon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+</script>
 
 </body>
 
