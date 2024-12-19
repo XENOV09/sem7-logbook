@@ -53,7 +53,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Logbook</title>
+    <title>Kegiatan <?php echo $nm_divisi; ?></title>
 
     <!-- Fontfaces CSS-->
     <link href="../css/font-face.css" rel="stylesheet" media="all">
@@ -156,38 +156,36 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="table-responsive table--no-card m-b-30">
-                                            <!-- Ganti ID tabel agar sesuai dengan DataTables -->
-                                            <table id="kegiatanTable" class="table table-borderless table-earning">
-                                                <thead>
-                                                    <tr>
-                                                        <th>No</th>
-                                                        <th>Tanggal Kegiatan</th>
-                                                        <th>Oleh</th>
-                                                        <th>Jenis Kegiatan</th>
-                                                        <th>Kegiatan</th>
-                                                        <th>Lokasi</th>
-                                                        <th>Waktu Mulai</th>
-                                                        <th>Waktu Selesai</th>
-                                                        <th>Budget</th>
-                                                        <th>Pengeluaran</th>
-                                                        <th>Sisa</th>
-                                                        <th>Lampiran</th>
-                                                        <th>Catatan</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php
-                                                    // Filter dan parameter dari POST
-                                                    $search = isset($_POST['search']) ? $_POST['search'] : '';
-                                                    $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
-                                                    $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
-                                                    $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
+                                <div class="col-lg-12">
+                                    <div class="table-responsive table--no-card m-b-30">
+                                        <!-- Ganti ID tabel agar sesuai dengan DataTables -->
+                                        <table id="kegiatanTable" class="table table-borderless table-earning">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Action</th>
+                                                    <th>Tanggal Kegiatan</th>
+                                                    <th>Oleh</th>
+                                                    <th>Jenis Kegiatan</th>
+                                                    <th>Kegiatan</th>
+                                                    <th>Lokasi</th>
+                                                    <th>Waktu Mulai</th>
+                                                    <th>Waktu Selesai</th>
+                                                    <th>Lampiran</th>   
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                // Filter dan parameter dari POST
+                                                $search = isset($_POST['search']) ? $_POST['search'] : '';
+                                                $id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : '';
+                                                $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
+                                                $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
 
-                                                    // Query dasar
-
+                                                // Query dasar
+                                                if ($search) {
+                                                    $sql_kegiatan .= " AND (k.kegiatan LIKE '%$search%' OR u.nm_user LIKE '%$search%' OR j.jenis LIKE '%$search%' OR k.lokasi LIKE '%$search%')";
+                                                }
                                                 
                                                 if ($tanggal_awal && $tanggal_akhir) {
                                                     $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
@@ -200,46 +198,41 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                                 if ($id_user_filter) {
                                                     $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
                                                 }
-                                                    // Eksekusi query
-                                                    $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
-                                                    $no = 1;
-                                                    while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
-                                                    ?>
-                                                        <tr>
-                                                            <td><?php echo $no++; ?></td>
-                                                            <td><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td>
-                                                            <td><?php echo $row_kegiatan['nm_user']; ?></td>
-                                                            <td><?php echo $row_kegiatan['jenis']; ?></td>
-                                                            <td><?php echo $row_kegiatan['kegiatan']; ?></td>
-                                                            <td><?php echo $row_kegiatan['lokasi']; ?></td>
-                                                            <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_mulai'])); ?></td> <!-- Format waktu_mulai dengan waktu -->
-                                                            <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_selesai'])); ?></td> <!-- Format waktu_selesai dengan waktu -->
-                                                            <td>Rp <?php echo number_format($row_kegiatan['budget'], 0, ',', '.'); ?></td>
-                                                            <td>Rp <?php echo number_format($row_kegiatan['pengeluaran'], 0, ',', '.'); ?></td>
-                                                            <td>
-                                                                <span style="color: <?php echo $row_kegiatan['sisa'] < 0 ? 'red' : 'green'; ?>;">
-                                                                    Rp <?php echo number_format($row_kegiatan['sisa'], 0, ',', '.'); ?>
-                                                                </span>
-                                                            </td>                                                               <td>
-                                                                <?php if ($row_kegiatan["lampiran"]) : ?>
-                                                                    <a href="<?php echo '../images/lampiran/' . $row_kegiatan['lampiran']; ?>" class="btn btn-sm btn-info" target="_blank">
-                                                                        <i class="bx bx-download"></i>Download</a>
-                                                                <?php else : ?>
-                                                                    Tidak Ada Lampiran
-                                                                <?php endif; ?>
-                                                            </td>
-                                                            <td><?php echo $row_kegiatan['catatan']; ?></td>
-                                                            <td>
-                                                                <a href="kegiatan_edit.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
-                                                                <a href="kegiatan_hapus.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
-                                                            </td>
-                                                        </tr>
-                                                    <?php } ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                
+                                                // Eksekusi query
+                                                $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
+                                                $no = 1;
+                                                while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
+                                                ?>
+                                                    <tr>
+                                                        <td><?php echo $no++; ?></td>
+                                                        <td>
+                                                            <a href="kegiatan_edit.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-success">Edit</a>
+                                                            <a href="kegiatan_hapus.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                                                            <a href="kegiatan_detail.php?id_kegiatan=<?php echo $row_kegiatan['id_kegiatan']; ?>" class="btn btn-sm btn-info">Detail</a>
+                                                        </td>
+                                                        <td><?php echo date('d-m-Y', strtotime($row_kegiatan['tanggal'])); ?></td>
+                                                        <td><?php echo $row_kegiatan['nm_user']; ?></td>
+                                                        <td><?php echo $row_kegiatan['jenis']; ?></td>
+                                                        <td><?php echo $row_kegiatan['kegiatan']; ?></td>
+                                                        <td><?php echo $row_kegiatan['lokasi']; ?></td>
+                                                        <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_mulai'])); ?></td> <!-- Format waktu_mulai dengan waktu -->
+                                                        <td><?php echo date('d-m-Y H:i', strtotime($row_kegiatan['waktu_selesai'])); ?></td> <!-- Format waktu_selesai dengan waktu -->
+                                                        <td>
+                                                            <?php if ($row_kegiatan["lampiran"]) : ?>
+                                                                <a href="<?php echo '../images/lampiran/' . $row_kegiatan['lampiran']; ?>" class="btn btn-sm btn-info" target="_blank">
+                                                                    <i class="bx bx-download"></i> Download</a>
+                                                            <?php else : ?>
+                                                                Tidak Ada Lampiran
+                                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -272,6 +265,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
 
     <!-- Script untuk fixed header -->
     <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+    
     <!-- DataTables Buttons JS -->
     <script src="../vendor/datatable/js/jquery.dataTables.min.js"></script>
     <script src="../vendor/datatable/js/dataTables.bootstrap5.min.js"></script>
@@ -281,6 +275,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
         a {
             text-decoration: none;
         }
+        
     </style>
 
 <script>
@@ -289,9 +284,9 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
             dom: 'Bfrtip',  // Menambahkan area untuk tombol
             buttons: [
                 
-                //'copy',  // Menyalin data tabel
-                //'csv',   // Mengekspor ke CSV
-                //'excel', // Mengekspor ke Excel
+                'copy',  // Menyalin data tabel
+                'csv',   // Mengekspor ke CSV
+                'excel', // Mengekspor ke Excel
                 {
                     extend: 'pdf',  // Tombol untuk mengekspor ke PDF
                     text: 'PDF',
@@ -311,7 +306,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                                 bold: true,      // Menebalkan font header
                                 fontSize: 12,    // Ukuran font header
                                 color: 'white',   // Warna teks header
-                                fillColor: '#4CAF50' // Warna latar belakang header
+                                fillColor: '#000000' // Warna latar belakang header
                             },
                             // Menyesuaikan font untuk data tabel
                             tableCell: {
@@ -324,7 +319,7 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                         var rowCount = doc.content[1].table.body.length;
                         for (var i = 0; i < rowCount; i++) {
                             // Hapus kolom terakhir (kolom Action)
-                            doc.content[1].table.body[i].splice(13, 1); // Indeks kolom Action adalah 12
+                            doc.content[1].table.body[i].splice(1, 1); // Indeks kolom Action adalah 12
                         }
 
                         // Menambahkan header khusus ke dalam PDF
@@ -354,16 +349,17 @@ $result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user WHE
                 //     text: 'Print',
                 //     customize: function(win) {
                 //         // Menyembunyikan kolom Action di Print
-                //         $(win.document.body).find('th:nth-child(14), td:nth-child(14)').css('display', 'none');
+                //         $(win.document.body).find('th:nth-child(2), td:nth-child(2)').css('display', 'none');
                 //     }
                 // }
             ],
-            "scrollX": true,          // Aktifkan pengguliran horizontal
-            "paging": false,           // Aktifkan pagination
-            "searching": false,       // Aktifkan pencarian
+            
+            "scrollX": false,          // Aktifkan pengguliran horizontal
+            "paging": true,           // Aktifkan pagination
+            "searching": true,       // Aktifkan pencarian
             "ordering": true,         // Aktifkan pengurutan
             "info": true,             // Tampilkan info jumlah data
-            "lengthChange": false,     // Pilihan jumlah data per halaman
+            "lengthChange": true,     // Pilihan jumlah data per halaman
             "pageLength": 10,         // Banyaknya data per halaman
             "fixedColumns": {
                 leftColumns: 0,       // Buat kolom pertama tetap statis

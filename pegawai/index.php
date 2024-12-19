@@ -24,6 +24,33 @@ $user_count = mysqli_fetch_assoc($user_result)['count'];
 $divisi_count = mysqli_fetch_assoc($divisi_result)['count'];
 $kegiatan_count = mysqli_fetch_assoc($kegiatan_result)['count'];
 $jenis_count = mysqli_fetch_assoc($jenis_result)['count'];
+
+// Query untuk menghitung total pengeluaran berdasarkan id_divisi
+$pengeluaran_query = "SELECT d.nm_divisi, SUM(k.pengeluaran) AS total_pengeluaran FROM kegiatan k 
+                       JOIN divisi d ON k.id_divisi = d.id_divisi 
+                       GROUP BY k.id_divisi";
+$pengeluaran_result = mysqli_query($conn, $pengeluaran_query);
+
+$divisi_names = [];
+$pengeluaran_totals = [];
+
+while ($row = mysqli_fetch_assoc($pengeluaran_result)) {
+    $divisi_names[] = $row['nm_divisi'];
+    $pengeluaran_totals[] = (float) $row['total_pengeluaran'];
+}
+
+// Query untuk menghitung total budget berdasarkan id_divisi
+$budget_query = "SELECT d.nm_divisi, SUM(k.budget) AS total_budget FROM kegiatan k 
+                 JOIN divisi d ON k.id_divisi = d.id_divisi 
+                 GROUP BY k.id_divisi";
+$budget_result = mysqli_query($conn, $budget_query);
+
+$budget_totals = [];
+
+while ($row = mysqli_fetch_assoc($budget_result)) {
+    $budget_totals[] = (float) $row['total_budget'];
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -183,15 +210,34 @@ $jenis_count = mysqli_fetch_assoc($jenis_result)['count'];
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-lg-6">
+                            <div class="au-card m-b-30">
+                                <div class="au-card-inner">
+                                    <h3 class="title-2 m-b-40">Perbandingan Pengeluaran Antar Divisi</h3>
+                                    <canvas id="doughnut"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Donut untuk Total Budget -->
+                        <div class="col-lg-6">
+                            <div class="au-card m-b-30">
+                                <div class="au-card-inner">
+                                    <h3 class="title-2 m-b-40">Perbandingan Budget Antar Divisi</h3>
+                                    <canvas id="doughnut_budget"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-            <!-- END MAIN CONTENT-->
-            <!-- END PAGE CONTAINER-->
-        </div>
-
     </div>
+
+
 
     <!-- Jquery JS-->
     <script src="../vendor/jquery-3.2.1.min.js"></script>
@@ -222,6 +268,58 @@ $jenis_count = mysqli_fetch_assoc($jenis_result)['count'];
         }
     </style>
 
+    <script>
+        var ctx = document.getElementById("doughnut").getContext("2d");
+        var doughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: <?= json_encode($divisi_names) ?>,
+                datasets: [{
+                    label: "Pengeluaran",
+                    data: <?= json_encode ($pengeluaran_totals) ?>,
+                    backgroundColor: ["#4e73df", "#1cc88a", "#36b9cc", "#f6c23e", "#e74a3b"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                maintainAspectRatio: true,
+                responsive: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                }
+            }
+        });
+
+        // Grafik Donut untuk Budget
+        var ctx_budget = document.getElementById("doughnut_budget").getContext("2d");
+        var doughnutChartBudget = new Chart(ctx_budget, {
+            type: 'doughnut',
+            data: {
+                labels: <?= json_encode($divisi_names) ?>,
+                datasets: [{
+                    label: "Budget",
+                    data: <?= json_encode($budget_totals) ?>,
+                    backgroundColor: ["#4e73df", "#1cc88a", "#36b9cc", "#f6c23e", "#e74a3b"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                maintainAspectRatio: true,
+                responsive: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                }
+            }
+        });
+    </script>
 
 </body>
 

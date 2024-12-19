@@ -89,11 +89,10 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                                         <table id="kegiatanTable" class="table table-borderless table-earning"  >
                                             <thead>
                                                 <tr>
-                                                    <th>No</th>
-                                                    <th>ID Divisi</th>
+                                                    <th style="width: 5%;">No</th>
+                                                    <th style="width: 5%;">Action</th>
+                                                    <th style="width: 5%;">ID Divisi</th>
                                                     <th style="width: 50%;">Nama Divisi</th>
-                                                    <th style="width: 15%;">Action</th>
-
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -103,12 +102,12 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                                                 ?>
                                                     <tr>
                                                         <td><?php echo $no++; ?></td>
-                                                        <td><?php echo $row_divisi['id_divisi']; ?></td>
-                                                        <td><?php echo $row_divisi['nm_divisi']; ?></td>
                                                         <td>
                                                             <a href="divisi_edit.php?id_divisi=<?php echo $row_divisi['id_divisi']; ?>" class="btn btn-sm btn-success">Edit</a>
                                                             <a href="divisi_hapus.php?id_divisi=<?php echo $row_divisi['id_divisi']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus divisi ini?')">Hapus</a>
                                                         </td>
+                                                        <td><?php echo $row_divisi['id_divisi']; ?></td>
+                                                        <td><?php echo $row_divisi['nm_divisi']; ?></td>
                                                     </tr>
                                                 <?php } ?>
                                             </tbody>
@@ -167,9 +166,9 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
             dom: 'Bfrtip',  // Menambahkan area untuk tombol
             buttons: [
                 
-                //'copy',  // Menyalin data tabel
-                //'csv',   // Mengekspor ke CSV
-                //'excel', // Mengekspor ke Excel
+                'copy',  // Menyalin data tabel
+                'csv',   // Mengekspor ke CSV
+                'excel', // Mengekspor ke Excel
                 {
                     extend: 'pdf',  // Tombol untuk mengekspor ke PDF
                     text: 'PDF',
@@ -202,7 +201,7 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                         var rowCount = doc.content[1].table.body.length;
                         for (var i = 0; i < rowCount; i++) {
                             // Hapus kolom terakhir (kolom Action)
-                            doc.content[1].table.body[i].splice(3, 1); // Indeks kolom Action dimulai dari 0
+                            doc.content[1].table.body[i].splice(1, 1); // Indeks kolom Action dimulai dari 0
                         }
 
                         // Menambahkan header khusus ke dalam PDF
@@ -237,11 +236,11 @@ $result_divisi = mysqli_query($conn, $sql_divisi);
                 // }
             ],
             "scrollX": false,          // Aktifkan pengguliran horizontal
-            "paging": false,           // Aktifkan pagination
+            "paging": true,           // Aktifkan pagination
             "searching": true,       // Aktifkan pencarian
             "ordering": true,         // Aktifkan pengurutan
             "info": true,             // Tampilkan info jumlah data
-            "lengthChange": false,     // Pilihan jumlah data per halaman
+            "lengthChange": true,     // Pilihan jumlah data per halaman
             "pageLength": 10,         // Banyaknya data per halaman
             "fixedColumns": {
                 leftColumns: 0,       // Buat kolom pertama tetap statis

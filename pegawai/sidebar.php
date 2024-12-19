@@ -138,6 +138,30 @@
             font-weight: 900;
             margin-left: auto;
         }
+
+        .js-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        color: #333; /* Warna teks */
+        padding: 10px 15px; 
+        font-size: 16px; 
+        }
+
+        .js-arrow i {
+            margin-right: 8px; /* Jarak antara ikon buku dan teks */
+        }
+
+        .arrow-icon {
+            margin-left: auto; /* Membuat panah berada di ujung kanan */
+            transition: transform 0.3s; /* Animasi saat submenu dibuka */
+        }
+
+        .js-arrow.active .arrow-icon {
+            transform: rotate(180deg); /* Rotasi panah saat menu aktif */
+        }
+
     </style>
 
 
@@ -206,9 +230,11 @@
 
                 <!-- Menu Utama -->
                 <li class="has-sub <?= (basename($_SERVER['PHP_SELF']) == 'kegiatan.php') ? 'active show' : '' ?>">
-                    <a class="js-arrow" href="#">
-                        <i class="fas fa-book"></i>Menu Utama
-                    </a>
+                <a class="js-arrow" href="#">
+                    <i class="fas fa-book"></i> Menu Utama
+                    <i class="fas fa-chevron-down arrow-icon"></i> <!-- Panah di samping -->
+                </a>
+
                     <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (basename($_SERVER['PHP_SELF']) == 'kegiatan.php') ? 'style="display:block;"' : '' ?>>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'kegiatan.php') ? 'active' : '' ?>">
                             <a href="kegiatan.php">Kegiatan</a>
@@ -239,4 +265,12 @@
                 parent.classList.toggle('open');
             });
         });
+</script>
+
+<script>
+document.querySelectorAll('.js-arrow').forEach(item => {
+    item.addEventListener('click', function() {
+        this.classList.toggle('active'); // Tambah/hapus kelas active
+    });
+});
 </script>

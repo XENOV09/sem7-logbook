@@ -138,6 +138,19 @@
             font-weight: 900;
             margin-left: auto;
         }
+        
+        .js-arrow i {
+            margin-right: 8px; /* Jarak antara ikon buku dan teks */
+        }
+
+        .arrow-icon {
+            margin-left: auto; /* Membuat panah berada di ujung kanan */
+            transition: transform 0.3s; /* Animasi saat submenu dibuka */
+        }
+
+        .js-arrow.active .arrow-icon {
+            transform: rotate(180deg); /* Rotasi panah saat menu aktif */
+        }
     </style>
 
 
@@ -219,6 +232,7 @@
                 <li class="has-sub <?= (basename($_SERVER['PHP_SELF']) == 'kegiatan.php') ? 'active show' : '' ?>">
                     <a class="js-arrow" href="#">
                         <i class="fas fa-book"></i>Menu Utama
+                        <i class="fas fa-chevron-down arrow-icon"></i> <!-- Panah di samping -->
                     </a>
                     <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (basename($_SERVER['PHP_SELF']) == 'kegiatan.php') ? 'style="display:block;"' : '' ?>>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'kegiatan.php') ? 'active' : '' ?>">
@@ -231,6 +245,7 @@
                 <li class="has-sub <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php', 'jenis.php'])) ? 'active show' : '' ?>">
                     <a class="js-arrow" href="#">
                         <i class="fas fa-gear"></i>Kelola Data
+                        <i class="fas fa-chevron-down arrow-icon"></i> <!-- Panah di samping -->
                     </a>
                     <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (in_array(basename($_SERVER['PHP_SELF']), ['user.php', 'divisi.php', 'jenis.php'])) ? 'style="display:block;"' : '' ?>>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'user.php') ? 'active' : '' ?>">
@@ -241,6 +256,31 @@
                         </li>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'jenis.php') ? 'active' : '' ?>">
                             <a href="jenis.php">Jenis Kegiatan</a>
+                        </li>
+                    </ul>
+                </li>
+
+                 <!-- Menu Report -->
+                 <li class="has-sub <?= (in_array(basename($_SERVER['PHP_SELF']), ['laporan_kegiatan_divisi.php', 'laporan_kegiatan_pengguna.php', 'laporan_jenis.php', 'laporan_user.php', 'laporan_divisi.php'])) ? 'active show' : '' ?>">
+                    <a class="js-arrow" href="#">
+                        <i class="fas fa-file"></i>Laporan
+                        <i class="fas fa-chevron-down arrow-icon"></i> <!-- Panah di samping -->
+                    </a>
+                    <ul class="list-unstyled navbar__sub-list js-sub-list" <?= (in_array(basename($_SERVER['PHP_SELF']), ['laporan_kegiatan_divisi.php', 'laporan_kegiatan_pengguna.php', 'laporan_jenis.php', 'laporan_user.php', 'laporan_divisi.php'])) ? 'style="display:block;"' : '' ?>>
+                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'laporan_kegiatan_divisi.php') ? 'active' : '' ?>">
+                            <a href="laporan_kegiatan_divisi.php">Laporan Kegiatan Divisi</a>
+                        </li>
+                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'laporan_kegiatan_pengguna.php') ? 'active' : '' ?>">
+                            <a href="laporan_kegiatan_pengguna.php">Laporan Kegiatan Pengguna</a>
+                        </li>
+                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'laporan_jenis.php') ? 'active' : '' ?>">
+                            <a href="laporan_jenis.php">Laporan Jenis Kegiatan</a>
+                        </li>
+                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'laporan_user.php') ? 'active' : '' ?>">
+                            <a href="laporan_user.php">Laporan User</a>
+                        </li>
+                        <li class="<?= (basename($_SERVER['PHP_SELF']) == 'laporan_divisi.php') ? 'active' : '' ?>">
+                            <a href="laporan_divisi.php">Jenis Divisi</a>
                         </li>
                     </ul>
                 </li>
@@ -268,4 +308,12 @@
                 parent.classList.toggle('open');
             });
         });
+</script>
+
+<script>
+document.querySelectorAll('.js-arrow').forEach(item => {
+    item.addEventListener('click', function() {
+        this.classList.toggle('active'); // Tambah/hapus kelas active
+    });
+});
 </script>

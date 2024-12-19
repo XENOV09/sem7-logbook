@@ -95,11 +95,11 @@ $result_user = mysqli_query($conn, $sql_user);
                                                 <thead>
                                                 <tr>
                                                         <th>No</th>
+                                                        <th>Action</th>
                                                         <th>Nama</th>
                                                         <th>Divisi</th>
                                                         <th>Username</th>
                                                         <th>Role</th>
-                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -107,16 +107,16 @@ $result_user = mysqli_query($conn, $sql_user);
                                                     $no = 1;
                                                     while ($row_user = mysqli_fetch_assoc($result_user)) { 
                                                     ?>
-                                                        <tr>
+                                                        <tr>   
                                                             <td><?php echo $no++; ?></td>
+                                                            <td>
+                                                                <a href="user_edit.php?id_user=<?php echo $row_user['id_user']; ?>" class="btn btn-sm btn-success">Edit</a>
+                                                                <a href="user_hapus.php?id_user=<?php echo $row_user['id_user']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus pengguna ini?')">Hapus</a>
+                                                            </td> 
                                                             <td><?php echo $row_user['nm_user']; ?></td>
                                                             <td><?php echo $row_user['nm_divisi']; ?></td>
                                                             <td><?php echo $row_user['username']; ?></td>
                                                             <td><?php echo $row_user['role']; ?></td>
-                                                            <td>
-                                                                <a href="user_edit.php?id_user=<?php echo $row_user['id_user']; ?>" class="btn btn-sm btn-success">Edit</a>
-                                                                <a href="user_hapus.php?id_user=<?php echo $row_user['id_user']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus pengguna ini?')">Hapus</a>
-                                                            </td>
                                                         </tr>
                                                     <?php } ?>
                                                 </tbody>
@@ -133,7 +133,6 @@ $result_user = mysqli_query($conn, $sql_user);
         <!-- END MAIN CONTENT-->
         <!-- END PAGE CONTAINER-->
     </div>
-
     <!-- Jquery JS-->
     <script src="../vendor/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap JS-->
@@ -177,9 +176,9 @@ $result_user = mysqli_query($conn, $sql_user);
             dom: 'Bfrtip',  // Menambahkan area untuk tombol
             buttons: [
                 
-                //'copy',  // Menyalin data tabel
-                //'csv',   // Mengekspor ke CSV
-                //'excel', // Mengekspor ke Excel
+                'copy',  // Menyalin data tabel
+                'csv',   // Mengekspor ke CSV
+                'excel', // Mengekspor ke Excel
                 {
                     extend: 'pdf',  // Tombol untuk mengekspor ke PDF
                     text: 'PDF',
@@ -212,7 +211,7 @@ $result_user = mysqli_query($conn, $sql_user);
                         var rowCount = doc.content[1].table.body.length;
                         for (var i = 0; i < rowCount; i++) {
                             // Hapus kolom terakhir (kolom Action)
-                            doc.content[1].table.body[i].splice(6, 1); // Indeks kolom Action dimulai dari 0
+                            doc.content[1].table.body[i].splice(1   , 1); // Indeks kolom Action dimulai dari 0
                         }
 
                         // Menambahkan header khusus ke dalam PDF
@@ -247,11 +246,11 @@ $result_user = mysqli_query($conn, $sql_user);
                 // }
             ],
             "scrollX": false,          // Aktifkan pengguliran horizontal
-            "paging": false,           // Aktifkan pagination
+            "paging": true,           // Aktifkan pagination
             "searching": true,       // Aktifkan pencarian
             "ordering": true,         // Aktifkan pengurutan
             "info": true,             // Tampilkan info jumlah data
-            "lengthChange": false,     // Pilihan jumlah data per halaman
+            "lengthChange": true,     // Pilihan jumlah data per halaman
             "pageLength": 10,         // Banyaknya data per halaman
             "fixedColumns": {
                 leftColumns: 0,       // Buat kolom pertama tetap statis
@@ -263,4 +262,5 @@ $result_user = mysqli_query($conn, $sql_user);
 
 
 </body>
+
 </html>
