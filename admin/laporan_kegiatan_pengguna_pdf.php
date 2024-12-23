@@ -4,7 +4,7 @@ require('../vendor/fpdf/fpdf.php');  // Pastikan path FPDF sesuai dengan tempat 
 // Ambil parameter yang dikirimkan melalui URL
 $tanggal_awal = isset($_GET['tanggal_awal']) ? $_GET['tanggal_awal'] : '';
 $tanggal_akhir = isset($_GET['tanggal_akhir']) ? $_GET['tanggal_akhir'] : '';
-$id_divisi_filter = isset($_GET['id_divisi']) ? $_GET['id_divisi'] : '';
+$id_user_filter = isset($_GET['id_user']) ? $_GET['id_user'] : '';
 
 // Koneksi ke database
 include "../koneksi.php";
@@ -15,9 +15,10 @@ $sql_kegiatan = "
     FROM kegiatan k
     JOIN jenis j ON j.id_jenis = k.id_jenis
     JOIN user u ON u.id_user = k.id_user
-    JOIN divisi d ON d.id_divisi = k.id_divisi";
+    JOIN divisi d ON d.id_divisi = k.id_divisi
+    WHERE 1=1"; // Kondisi default untuk menambahkan filter secara dinamis
 
-// Filter berdasarkan tanggal dan divisi
+// Filter berdasarkan tanggal
 if ($tanggal_awal && $tanggal_akhir) {
     $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
 } elseif ($tanggal_awal) {
@@ -25,8 +26,10 @@ if ($tanggal_awal && $tanggal_akhir) {
 } elseif ($tanggal_akhir) {
     $sql_kegiatan .= " AND k.tanggal <= '$tanggal_akhir'";
 }
-if ($id_divisi_filter) {
-    $sql_kegiatan .= " AND k.id_divisi = '$id_divisi_filter'";
+
+// Filter berdasarkan user
+if ($id_user_filter) {
+    $sql_kegiatan .= " AND k.id_user = '$id_user_filter'";
 }
 
 // Eksekusi query
@@ -38,7 +41,7 @@ $pdf->AddPage();
 $pdf->SetFont('Arial', 'B', 12);
 
 // Judul Laporan
-$pdf->Cell(0, 10, 'Laporan Kegiatan Divisi', 0, 1, 'C');
+$pdf->Cell(0, 10, 'Laporan Kegiatan Berdasarkan Pengguna', 0, 1, 'C');
 $pdf->Cell(0, 10, 'Tanggal: ' . ($tanggal_awal ? $tanggal_awal : 'Semua Tanggal Awal') . ' - ' . ($tanggal_akhir ? $tanggal_akhir : 'Semua Tanggal Akhir'), 0, 1, 'C');
 $pdf->Ln(10);
 

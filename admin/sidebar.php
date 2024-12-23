@@ -280,7 +280,7 @@
                             <a href="laporan_user.php">Laporan User</a>
                         </li>
                         <li class="<?= (basename($_SERVER['PHP_SELF']) == 'laporan_divisi.php') ? 'active' : '' ?>">
-                            <a href="laporan_divisi.php">Jenis Divisi</a>
+                            <a href="laporan_divisi.php">Laporan Divisi</a>
                         </li>
                     </ul>
                 </li>

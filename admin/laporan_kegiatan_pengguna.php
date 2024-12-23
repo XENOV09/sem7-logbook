@@ -11,22 +11,17 @@ if (!isset($_SESSION['id_user'])) {
 // Ambil id_user dari session
 $id_user = $_SESSION['id_user'];
 
-// Ambil id_divisi dari tabel user berdasarkan id_user
-$result_user = mysqli_query($conn, "SELECT id_divisi FROM user WHERE id_user = '$id_user'");
+// Ambil nama pengguna berdasarkan id_user
+$result_user = mysqli_query($conn, "SELECT nm_user FROM user WHERE id_user = '$id_user'");
 $user_data = mysqli_fetch_assoc($result_user);
-$id_divisi_user = $user_data['id_divisi'];
-
-// Ambil nama divisi berdasarkan id_divisi
-$result_divisi = mysqli_query($conn, "SELECT nm_divisi FROM divisi WHERE id_divisi = '$id_divisi_user'");
-$divisi_data = mysqli_fetch_assoc($result_divisi);
-$nm_divisi = $divisi_data ? $divisi_data['nm_divisi'] : 'Divisi Tidak Ditemukan';
+$nm_user = $user_data ? $user_data['nm_user'] : 'Pengguna Tidak Ditemukan';
 
 // Filter tanggal
 $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
 $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
 
-// Filter divisi
-$id_divisi_filter = isset($_POST['id_divisi']) ? $_POST['id_divisi'] : ''; // Menangkap nilai divisi filter dari form
+// Filter user
+$id_user_filter = isset($_POST['id_user']) ? $_POST['id_user'] : ''; // Menangkap nilai user filter dari form
 
 // Query dasar
 $sql_kegiatan = "
@@ -36,13 +31,8 @@ $sql_kegiatan = "
     JOIN user u ON u.id_user = k.id_user
     JOIN divisi d ON d.id_divisi = k.id_divisi";
 
-// Eksekusi query
-$result_kegiatan = mysqli_query($conn, $sql_kegiatan);
-$jml_logbook = mysqli_num_rows($result_kegiatan);
-
-// Ambil daftar divisi untuk dropdown (dengan filter id_divisi)
-$result_divisi_filter = mysqli_query($conn, "SELECT id_divisi, nm_divisi FROM divisi");
-
+// Ambil daftar pengguna untuk dropdown (filter user)
+$result_user_filter = mysqli_query($conn, "SELECT id_user, nm_user FROM user");
 
 ?>
 
@@ -58,7 +48,7 @@ $result_divisi_filter = mysqli_query($conn, "SELECT id_divisi, nm_divisi FROM di
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Laporan Kegiatan Divisi</title>
+    <title>Laporan Kegiatan Pengguna</title>
 
     <!-- Fontfaces CSS-->
     <link href="../css/font-face.css" rel="stylesheet" media="all">
@@ -96,69 +86,70 @@ $result_divisi_filter = mysqli_query($conn, "SELECT id_divisi, nm_divisi FROM di
         <!-- PAGE CONTAINER-->
         <?php include 'header.php'; ?>
 
-            <!-- MAIN CONTENT-->
-            <div class="main-content">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="overview-wrap">
-                                <h2 class="title-1">Laporan - Kegiatan Divisi</h2>
-                                </div>
+        <!-- MAIN CONTENT-->
+        <div class="main-content">
+            <div class="section__content section__content--p30">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="overview-wrap">
+                                <h2 class="title-1">Laporan - Kegiatan Pengguna</h2>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Filter Tanggal dan Divisi -->
-                        <form method="POST" class="mb-3">
-                            <div class="row">
-                                <!-- Filter Divisi -->
-                                <div class="col-md-3 mb-2">
-                                    <label for="id_divisi">Pilih Divisi</label>
-                                    <select name="id_divisi" class="form-control" id="id_divisi">
-                                        <option value="">Semua</option>
-                                        <?php 
-                                        // Menambahkan filter divisi
-                                        while ($divisi = mysqli_fetch_assoc($result_divisi_filter)) {
-                                            ?>
-                                            <option value="<?php echo $divisi['id_divisi']; ?>" <?php echo ($id_divisi_filter == $divisi['id_divisi']) ? 'selected' : ''; ?>><?php echo $divisi['nm_divisi']; ?></option>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-
-                                <!-- Filter Tanggal Awal -->
-                                <div class="col-md-2 mb-2">
-                                    <label for="tanggal_awal">Tanggal Awal</label>
-                                    <input type="date" name="tanggal_awal" class="form-control" value="<?php echo $tanggal_awal; ?>" placeholder="Tanggal Awal" id="tanggal_awal">
-                                </div>
-
-                                <!-- Filter Tanggal Akhir -->
-                                <div class="col-md-2 mb-2">
-                                    <label for="tanggal_akhir">Tanggal Akhir</label>
-                                    <input type="date" name="tanggal_akhir" class="form-control" value="<?php echo $tanggal_akhir; ?>" placeholder="Tanggal Akhir" id="tanggal_akhir">
-                                </div>
-
-                                <!-- Tombol Filter -->
-                                <div class="col-md-2 mb-2 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-success w-100">Filter</button>
-                                </div>
+                    <!-- Filter Tanggal dan User -->
+                    <form method="POST" class="mb-3">
+                        <div class="row">
+                            <!-- Filter User -->
+                            <div class="col-md-3 mb-2">
+                                <label for="id_user">Pilih Pengguna</label>
+                                <select name="id_user" class="form-control" id="id_user">
+                                    <option value="">Semua</option>
+                                    <?php 
+                                    while ($user = mysqli_fetch_assoc($result_user_filter)) {
+                                        ?>
+                                        <option value="<?php echo $user['id_user']; ?>" <?php echo ($id_user_filter == $user['id_user']) ? 'selected' : ''; ?>>
+                                            <?php echo $user['nm_user']; ?>
+                                        </option>
+                                    <?php } ?>
+                                </select>
                             </div>
-                        </form>
 
-                        <!-- Tabel untuk menampilkan data kegiatan -->
-                        <div class="card">
-                            <div class="card-body">
-                                <!-- Menambahkan tombol "Tambah Kegiatan" di atas kanan tabel -->
-                                <div class="row mb-3">
+                            <!-- Filter Tanggal Awal -->
+                            <div class="col-md-2 mb-2">
+                                <label for="tanggal_awal">Tanggal Awal</label>
+                                <input type="date" name="tanggal_awal" class="form-control" value="<?php echo $tanggal_awal; ?>" placeholder="Tanggal Awal" id="tanggal_awal">
+                            </div>
+
+                            <!-- Filter Tanggal Akhir -->
+                            <div class="col-md-2 mb-2">
+                                <label for="tanggal_akhir">Tanggal Akhir</label>
+                                <input type="date" name="tanggal_akhir" class="form-control" value="<?php echo $tanggal_akhir; ?>" placeholder="Tanggal Akhir" id="tanggal_akhir">
+                            </div>
+
+                            <!-- Tombol Filter -->
+                            <div class="col-md-2 mb-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-success w-100">Filter</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Tabel untuk menampilkan data kegiatan -->
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- Tombol "Print Laporan" -->
+                            <div class="row mb-3">
                                 <div class="col-lg-12 text-end">
-                                    <!-- Ganti tombol "Tambah Kegiatan" menjadi tombol "Print" -->
-                                    <a href="laporan_kegiatan_divisi_pdf.php?tanggal_awal=<?php echo $tanggal_awal; ?>&tanggal_akhir=<?php echo $tanggal_akhir; ?>&id_divisi=<?php echo $id_divisi_filter; ?>" class="btn btn-success"><i class="bx bx-printer"></i> Print Laporan</a>
+                                    <a href="laporan_kegiatan_pengguna_pdf.php?tanggal_awal=<?php echo $tanggal_awal; ?>&tanggal_akhir=<?php echo $tanggal_akhir; ?>&id_user=<?php echo $id_user_filter; ?>" class="btn btn-success"><i class="bx bx-printer"></i> Print Laporan</a>
                                 </div>
                             </div>
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="table-responsive table--no-card m-b-30">
-                                            <!-- Ganti ID tabel agar sesuai dengan DataTables -->
-                                            <table id="kegiatanTable" class="table table-borderless table-earning">
+
+                            <!-- Tabel Data Kegiatan -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="table-responsive table--no-card m-b-30">
+                                        <table id="kegiatanTable" class="table table-borderless table-earning">
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
@@ -180,24 +171,17 @@ $result_divisi_filter = mysqli_query($conn, "SELECT id_divisi, nm_divisi FROM di
                                                 <?php
                                                 // Menambahkan filter berdasarkan POST
                                                 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                                                    $search = isset($_POST['search']) ? $_POST['search'] : '';
-                                                    $id_divisi_filter = isset($_POST['id_divisi']) ? $_POST['id_divisi'] : '';
-                                                    $tanggal_awal = isset($_POST['tanggal_awal']) ? $_POST['tanggal_awal'] : '';
-                                                    $tanggal_akhir = isset($_POST['tanggal_akhir']) ? $_POST['tanggal_akhir'] : '';
-                                                    
-                                                    // Pencarian dan filter lainnya
                                                     if ($tanggal_awal && $tanggal_akhir) {
-                                                        $sql_kegiatan .= " AND k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
+                                                        $sql_kegiatan .= " WHERE k.tanggal BETWEEN '$tanggal_awal' AND '$tanggal_akhir'";
                                                     } elseif ($tanggal_awal) {
-                                                        $sql_kegiatan .= " AND k.tanggal >= '$tanggal_awal'";
+                                                        $sql_kegiatan .= " WHERE k.tanggal >= '$tanggal_awal'";
                                                     } elseif ($tanggal_akhir) {
-                                                        $sql_kegiatan .= " AND k.tanggal <= '$tanggal_akhir'";
+                                                        $sql_kegiatan .= " WHERE k.tanggal <= '$tanggal_akhir'";
                                                     }
-                                                    if ($id_divisi_filter) {
-                                                        $sql_kegiatan .= " AND k.id_divisi = '$id_divisi_filter'";
+                                                    if ($id_user_filter) {
+                                                        $sql_kegiatan .= (strpos($sql_kegiatan, 'WHERE') !== false ? " AND" : " WHERE") . " k.id_user = '$id_user_filter'";
                                                     }
-                                                    
-                                                    // Eksekusi query
+
                                                     $result_kegiatan = mysqli_query($conn, $sql_kegiatan);
                                                     $no = 1;
                                                     while ($row_kegiatan = mysqli_fetch_assoc($result_kegiatan)) {
@@ -220,7 +204,6 @@ $result_divisi_filter = mysqli_query($conn, "SELECT id_divisi, nm_divisi FROM di
                                                 <?php }} ?>
                                             </tbody>
                                         </table>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -230,9 +213,7 @@ $result_divisi_filter = mysqli_query($conn, "SELECT id_divisi, nm_divisi FROM di
             </div>
         </div>
         <!-- END MAIN CONTENT-->
-        <!-- END PAGE CONTAINER-->
-    </div>
-</body>
+    </div></body>
 </html>
 
 
